@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "Hero_001",
+    "DisplayName": "브레이브 로봇",
+    "UnitType": "Hero",
+    "MaxHealth": 100,
+    "AttackDamage": 10,
+    "MoveSpeed": 3,
+    "DetectionRange": 20,
+    "AttackRange": 1.5,
+    "AttackInterval": 1,
+    "PrefabKey": "Unit/Hero/BraveRobot"
+  },
+  {
+    "ID": "Enemy_001",
+    "DisplayName": "근접 전투 로봇",
+    "UnitType": "Enemy",
+    "MaxHealth": 30,
+    "AttackDamage": 5,
+    "MoveSpeed": 2,
+    "DetectionRange": 15,
+    "AttackRange": 1.2,
+    "AttackInterval": 1.2,
+    "PrefabKey": "Unit/Enemy/MeleeRobot"
+  }
+]
