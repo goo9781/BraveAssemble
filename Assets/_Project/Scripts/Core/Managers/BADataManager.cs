@@ -5,7 +5,13 @@ using UnityEngine;
 
 public class BADataManager : MonoBehaviour
 {
-    private const string _unitTableResourcePath = "Data/Tables/UnitTable";
+    private const string _unitTableResourcePath = "JsonOutput/UnitTable";
+
+    [Serializable]
+    private class SerializationWrapper<T> where T : BAGameDataBase
+    {
+        public List<T> items;
+    }
 
     private readonly Dictionary<string, BAUnitData> _unitDataById = new Dictionary<string, BAUnitData>();
 
@@ -69,11 +75,12 @@ public class BADataManager : MonoBehaviour
             yield break;
         }
 
-        BAUnitTableData unitTableData = null;
+        SerializationWrapper<BAUnitData> wrapper = null;
+        string wrappedJson = "{\"items\":" + unitTableAsset.text + "}";
 
         try
         {
-            unitTableData = JsonUtility.FromJson<BAUnitTableData>(unitTableAsset.text);
+            wrapper = JsonUtility.FromJson<SerializationWrapper<BAUnitData>>(wrappedJson);
         }
         catch (Exception exception)
         {
@@ -82,7 +89,7 @@ public class BADataManager : MonoBehaviour
             yield break;
         }
 
-        if (unitTableData == null || unitTableData.Units == null)
+        if (wrapper == null || wrapper.items == null)
         {
             Debug.LogError("유닛 데이터 테이블을 역직렬화하지 못했거나 유닛 목록이 없습니다.");
             _isInitializing = false;
@@ -91,7 +98,7 @@ public class BADataManager : MonoBehaviour
 
         _unitDataById.Clear();
 
-        foreach (BAUnitData unitData in unitTableData.Units)
+        foreach (BAUnitData unitData in wrapper.items)
         {
             if (unitData == null)
             {
@@ -99,19 +106,19 @@ public class BADataManager : MonoBehaviour
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(unitData.Id))
+            if (string.IsNullOrWhiteSpace(unitData.ID))
             {
                 Debug.LogError("유닛 데이터 테이블에서 ID가 비어 있는 유닛 항목을 발견했습니다.");
                 continue;
             }
 
-            if (_unitDataById.ContainsKey(unitData.Id))
+            if (_unitDataById.ContainsKey(unitData.ID))
             {
-                Debug.LogError($"유닛 데이터 테이블에서 중복된 ID를 발견했습니다: {unitData.Id}");
+                Debug.LogError($"유닛 데이터 테이블에서 중복된 ID를 발견했습니다: {unitData.ID}");
                 continue;
             }
 
-            _unitDataById.Add(unitData.Id, unitData);
+            _unitDataById.Add(unitData.ID, unitData);
         }
 
         if (_unitDataById.Count == 0)
