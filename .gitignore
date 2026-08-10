@@ -1,0 +1,61 @@
+# This .gitignore file should be placed at the root of your Unity project directory
+#
+# Based on https://github.com/github/gitignore/blob/main/Unity.gitignore
+
+.utmp/
+
+# Unity-generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Editor and build-system caches
+.vs/
+.gradle/
+ExportedObj/
+.consulo/
+
+# Auto-generated IDE solution and project files
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+
+# Logs and crash reports
+*.log
+sysinfo.txt
+mono_crash.*
+
+# Blender backup files
+*.blend1
+
+# Build artifacts
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Generated service files
+crashlytics-build.properties
+
+# Keep Unity metadata tracked
+!*.meta
+!**/*.meta
