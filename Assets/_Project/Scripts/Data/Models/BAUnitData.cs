@@ -1,9 +1,8 @@
 using UnityEngine;
 
 [System.Serializable]
-public class BAUnitData
+public class BAUnitData : BAGameDataBase
 {
-    [SerializeField] private string _id;
     [SerializeField] private string _displayName;
     [SerializeField] private string _unitType;
     [SerializeField] private float _maxHealth;
@@ -14,7 +13,7 @@ public class BAUnitData
     [SerializeField] private float _attackInterval;
     [SerializeField] private string _prefabKey;
 
-    public string Id => _id;
+    public string Id => ID;
     public string DisplayName => _displayName;
     public string UnitType => _unitType;
     public float MaxHealth => _maxHealth;
