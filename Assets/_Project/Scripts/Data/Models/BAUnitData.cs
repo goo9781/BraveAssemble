@@ -1,26 +1,13 @@
-using UnityEngine;
-
 [System.Serializable]
 public class BAUnitData : BAGameDataBase
 {
-    [SerializeField] private string _displayName;
-    [SerializeField] private string _unitType;
-    [SerializeField] private float _maxHealth;
-    [SerializeField] private float _attackDamage;
-    [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _detectionRange;
-    [SerializeField] private float _attackRange;
-    [SerializeField] private float _attackInterval;
-    [SerializeField] private string _prefabKey;
-
-    public string Id => ID;
-    public string DisplayName => _displayName;
-    public string UnitType => _unitType;
-    public float MaxHealth => _maxHealth;
-    public float AttackDamage => _attackDamage;
-    public float MoveSpeed => _moveSpeed;
-    public float DetectionRange => _detectionRange;
-    public float AttackRange => _attackRange;
-    public float AttackInterval => _attackInterval;
-    public string PrefabKey => _prefabKey;
+    public string DisplayName;
+    public string UnitType;
+    public float MaxHealth;
+    public float AttackDamage;
+    public float MoveSpeed;
+    public float DetectionRange;
+    public float AttackRange;
+    public float AttackInterval;
+    public string PrefabKey;
 }
