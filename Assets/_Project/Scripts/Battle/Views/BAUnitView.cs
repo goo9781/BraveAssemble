@@ -8,6 +8,12 @@ public class BAUnitView : MonoBehaviour
 
     public string Id => _viewModel?.Id;
     public string UnitType => _viewModel?.UnitType;
+    public float MaxHealth => _viewModel?.MaxHealth ?? 0f;
+    public float AttackDamage => _viewModel?.AttackDamage ?? 0f;
+    public float MoveSpeed => _viewModel?.MoveSpeed ?? 0f;
+    public float DetectionRange => _viewModel?.DetectionRange ?? 0f;
+    public float AttackRange => _viewModel?.AttackRange ?? 0f;
+    public float AttackInterval => _viewModel?.AttackInterval ?? 0f;
     public float CurrentHealth => _viewModel?.CurrentHealth ?? 0f;
     public bool IsDead => _viewModel == null || _viewModel.IsDead;
 
