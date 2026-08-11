@@ -4,7 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BAUnitView))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class BAUnitCombatController : MonoBehaviour
+public class BAUnitCombatController : MonoBehaviour, IBAPoolable
 {
     private const float _initializationTimeout = 10f;
     private const float _targetSearchInterval = 0.2f;
@@ -119,12 +119,26 @@ public class BAUnitCombatController : MonoBehaviour
         _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
     }
 
+    public void OnSpawned()
+    {
+        ResetCombatState();
+
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        _unitView.ResetState();
+    }
+
+    public void OnDespawned()
+    {
+        ResetCombatState();
+    }
+
     private void OnDisable()
     {
-        StopHorizontalMovement();
-        _target = null;
-        _nextTargetSearchTime = 0f;
-        _nextAttackTime = 0f;
+        ResetCombatState();
     }
 
     private void OnDestroy()
@@ -133,6 +147,21 @@ public class BAUnitCombatController : MonoBehaviour
         {
             BABattleManager.Instance.ReleaseUnit(_unitView);
         }
+    }
+
+    private void ResetCombatState()
+    {
+        _target = null;
+        _nextTargetSearchTime = 0f;
+        _nextAttackTime = 0f;
+
+        if (_rigidbody == null)
+        {
+            return;
+        }
+
+        _rigidbody.linearVelocity = Vector2.zero;
+        _rigidbody.angularVelocity = 0f;
     }
 
     private void StopHorizontalMovement()
