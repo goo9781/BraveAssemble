@@ -72,6 +72,69 @@ public class BABattleManager : MonoBehaviour
         return true;
     }
 
+    public bool TryFindNearestEnemy(BAUnitView requester, out BAUnitView target)
+    {
+        target = null;
+
+        if (!_isInitialized)
+        {
+            return false;
+        }
+
+        if (requester == null || !_boundUnits.ContainsKey(requester))
+        {
+            return false;
+        }
+
+        if (requester.IsDead || !requester.gameObject.activeInHierarchy)
+        {
+            return false;
+        }
+
+        if (requester.DetectionRange <= 0f)
+        {
+            return false;
+        }
+
+        Vector2 requesterPosition = requester.transform.position;
+        float detectionRangeSquared = requester.DetectionRange * requester.DetectionRange;
+        float nearestDistanceSquared = detectionRangeSquared;
+
+        foreach (BAUnitView candidate in _boundUnits.Keys)
+        {
+            if (candidate == requester)
+            {
+                continue;
+            }
+
+            if (candidate == null || !candidate.gameObject.activeInHierarchy || candidate.IsDead)
+            {
+                continue;
+            }
+
+            if (candidate.UnitType == requester.UnitType)
+            {
+                continue;
+            }
+
+            Vector2 candidatePosition = candidate.transform.position;
+            float distanceSquared = (candidatePosition - requesterPosition).sqrMagnitude;
+
+            if (distanceSquared > detectionRangeSquared)
+            {
+                continue;
+            }
+
+            if (target == null || distanceSquared < nearestDistanceSquared)
+            {
+                target = candidate;
+                nearestDistanceSquared = distanceSquared;
+            }
+        }
+
+        return target != null;
+    }
+
     public void ReleaseUnit(BAUnitView unitView)
     {
         if (unitView == null)
