@@ -5,6 +5,7 @@ using UnityEngine;
 public class BAGameManager : MonoBehaviour
 {
     [SerializeField] private BADataManager _dataManager;
+    [SerializeField] private BABattleManager _battleManager;
 
     private bool _isInitialized;
 
@@ -49,6 +50,18 @@ public class BAGameManager : MonoBehaviour
         if (!_dataManager.IsInitialized)
         {
             Debug.LogError("데이터 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (_battleManager == null)
+        {
+            Debug.LogError("BABattleManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (!_battleManager.Initialize(_dataManager))
+        {
+            Debug.LogError("전투 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
             yield break;
         }
 
