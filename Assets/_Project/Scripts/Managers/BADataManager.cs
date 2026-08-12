@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +6,7 @@ using UnityEngine;
 public class BADataManager : MonoBehaviour
 {
     private const string _unitTableResourcePath = "JsonOutput/UnitTable";
+    private const string _enemySpawnTableResourcePath = "JsonOutput/EnemySpawnTable";
 
     [Serializable]
     private class SerializationWrapper<T> where T : BAGameDataBase
@@ -14,6 +15,8 @@ public class BADataManager : MonoBehaviour
     }
 
     private readonly Dictionary<string, BAUnitData> _unitDataById = new Dictionary<string, BAUnitData>();
+    private readonly Dictionary<string, BAEnemySpawnData> _enemySpawnDataById =
+        new Dictionary<string, BAEnemySpawnData>();
 
     private bool _isInitialized;
     private bool _isInitializing;
@@ -62,68 +65,27 @@ public class BADataManager : MonoBehaviour
         }
 
         _isInitializing = true;
+        bool unitTableLoaded = false;
+        bool enemySpawnTableLoaded = false;
 
-        ResourceRequest loadRequest = Resources.LoadAsync<TextAsset>(_unitTableResourcePath);
-        yield return loadRequest;
+        yield return LoadTableAsync(
+            _unitTableResourcePath,
+            _unitDataById,
+            succeeded => unitTableLoaded = succeeded);
 
-        TextAsset unitTableAsset = loadRequest.asset as TextAsset;
-
-        if (unitTableAsset == null)
+        if (!unitTableLoaded)
         {
-            Debug.LogError($"유닛 데이터 테이블을 불러오지 못했습니다: Resources/{_unitTableResourcePath}");
             _isInitializing = false;
             yield break;
         }
 
-        SerializationWrapper<BAUnitData> wrapper = null;
-        string wrappedJson = "{\"items\":" + unitTableAsset.text + "}";
+        yield return LoadTableAsync(
+            _enemySpawnTableResourcePath,
+            _enemySpawnDataById,
+            succeeded => enemySpawnTableLoaded = succeeded);
 
-        try
+        if (!enemySpawnTableLoaded)
         {
-            wrapper = JsonUtility.FromJson<SerializationWrapper<BAUnitData>>(wrappedJson);
-        }
-        catch (Exception exception)
-        {
-            Debug.LogError($"유닛 데이터 테이블 역직렬화 중 오류가 발생했습니다: {exception.Message}");
-            _isInitializing = false;
-            yield break;
-        }
-
-        if (wrapper == null || wrapper.items == null)
-        {
-            Debug.LogError("유닛 데이터 테이블을 역직렬화하지 못했거나 유닛 목록이 없습니다.");
-            _isInitializing = false;
-            yield break;
-        }
-
-        _unitDataById.Clear();
-
-        foreach (BAUnitData unitData in wrapper.items)
-        {
-            if (unitData == null)
-            {
-                Debug.LogError("유닛 데이터 테이블에서 비어 있는 유닛 항목을 발견했습니다.");
-                continue;
-            }
-
-            if (string.IsNullOrWhiteSpace(unitData.ID))
-            {
-                Debug.LogError("유닛 데이터 테이블에서 ID가 비어 있는 유닛 항목을 발견했습니다.");
-                continue;
-            }
-
-            if (_unitDataById.ContainsKey(unitData.ID))
-            {
-                Debug.LogError($"유닛 데이터 테이블에서 중복된 ID를 발견했습니다: {unitData.ID}");
-                continue;
-            }
-
-            _unitDataById.Add(unitData.ID, unitData);
-        }
-
-        if (_unitDataById.Count == 0)
-        {
-            Debug.LogError("유효한 유닛 데이터가 없어 데이터 매니저 초기화에 실패했습니다.");
             _isInitializing = false;
             yield break;
         }
@@ -142,5 +104,88 @@ public class BADataManager : MonoBehaviour
         }
 
         return _unitDataById.TryGetValue(id, out unitData);
+    }
+
+    public bool TryGetEnemySpawnData(string id, out BAEnemySpawnData enemySpawnData)
+    {
+        enemySpawnData = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        return _enemySpawnDataById.TryGetValue(id, out enemySpawnData);
+    }
+
+    private IEnumerator LoadTableAsync<T>(
+        string resourcePath,
+        Dictionary<string, T> targetDictionary,
+        Action<bool> onCompleted) where T : BAGameDataBase
+    {
+        ResourceRequest loadRequest = Resources.LoadAsync<TextAsset>(resourcePath);
+        yield return loadRequest;
+
+        TextAsset tableAsset = loadRequest.asset as TextAsset;
+
+        if (tableAsset == null)
+        {
+            Debug.LogError($"데이터 테이블을 불러오지 못했습니다: Resources/{resourcePath}");
+            onCompleted?.Invoke(false);
+            yield break;
+        }
+
+        try
+        {
+            string wrappedJson = "{\"items\":" + tableAsset.text + "}";
+            SerializationWrapper<T> wrapper =
+                JsonUtility.FromJson<SerializationWrapper<T>>(wrappedJson);
+
+            if (wrapper == null || wrapper.items == null)
+            {
+                Debug.LogError($"데이터 테이블을 역직렬화하지 못했거나 데이터 목록이 없습니다: {resourcePath}");
+                onCompleted?.Invoke(false);
+                yield break;
+            }
+
+            targetDictionary.Clear();
+
+            foreach (T data in wrapper.items)
+            {
+                if (data == null)
+                {
+                    Debug.LogError($"데이터 테이블에서 비어 있는 항목을 발견했습니다: {resourcePath}");
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(data.ID))
+                {
+                    Debug.LogError($"데이터 테이블에서 ID가 비어 있는 항목을 발견했습니다: {resourcePath}");
+                    continue;
+                }
+
+                if (targetDictionary.ContainsKey(data.ID))
+                {
+                    Debug.LogError($"데이터 테이블에서 중복된 ID를 발견했습니다: {resourcePath}, ID: {data.ID}");
+                    continue;
+                }
+
+                targetDictionary.Add(data.ID, data);
+            }
+
+            if (targetDictionary.Count == 0)
+            {
+                Debug.LogError($"데이터 테이블에 유효한 데이터가 없습니다: {resourcePath}");
+                onCompleted?.Invoke(false);
+                yield break;
+            }
+
+            onCompleted?.Invoke(true);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"데이터 테이블 처리 중 오류가 발생했습니다: {resourcePath}, 오류: {exception.Message}");
+            onCompleted?.Invoke(false);
+        }
     }
 }

@@ -1,0 +1,12 @@
+[
+  {
+    "ID": "EnemySpawn_001",
+    "StageID": "Stage_001",
+    "UnitID": "Enemy_001",
+    "StartDelay": 1,
+    "SpawnInterval": 3.5,
+    "InitialPoolSize": 2,
+    "MaxAliveCount": 2,
+    "TotalSpawnCount": 5
+  }
+]
