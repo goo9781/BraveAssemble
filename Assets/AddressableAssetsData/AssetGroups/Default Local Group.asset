@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Default Local Group
   m_GUID: d89e344dcf6d0b944996fb50ee3795b1
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: e100090c77100e946b409779626cfa34
+    m_Address: Unit/Enemy/MeleeRobot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1e377a6b15dd42e40bee0322c23ecb95, type: 2}
   m_SchemaSet:
