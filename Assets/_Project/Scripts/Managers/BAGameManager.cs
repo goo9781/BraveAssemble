@@ -5,6 +5,7 @@ using UnityEngine;
 public class BAGameManager : MonoBehaviour
 {
     [SerializeField] private BADataManager _dataManager;
+    [SerializeField] private BAAssetManager _assetManager;
     [SerializeField] private BAPoolManager _poolManager;
     [SerializeField] private BABattleManager _battleManager;
 
@@ -51,6 +52,20 @@ public class BAGameManager : MonoBehaviour
         if (!_dataManager.IsInitialized)
         {
             Debug.LogError("데이터 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (_assetManager == null)
+        {
+            Debug.LogError("BAAssetManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        yield return _assetManager.InitializeAsync();
+
+        if (!_assetManager.IsInitialized)
+        {
+            Debug.LogError("에셋 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
             yield break;
         }
 
