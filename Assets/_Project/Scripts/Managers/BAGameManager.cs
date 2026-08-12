@@ -8,6 +8,7 @@ public class BAGameManager : MonoBehaviour
     [SerializeField] private BAAssetManager _assetManager;
     [SerializeField] private BAPoolManager _poolManager;
     [SerializeField] private BABattleManager _battleManager;
+    [SerializeField] private BAStageManager _stageManager;
 
     private bool _isInitialized;
 
@@ -92,6 +93,18 @@ public class BAGameManager : MonoBehaviour
         if (!_battleManager.Initialize(_dataManager))
         {
             Debug.LogError("전투 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (_stageManager == null)
+        {
+            Debug.LogError("BAStageManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (!_stageManager.Initialize())
+        {
+            Debug.LogError("스테이지 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
             yield break;
         }
 
