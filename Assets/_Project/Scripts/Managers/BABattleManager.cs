@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -13,6 +14,8 @@ public class BABattleManager : MonoBehaviour
     public static BABattleManager Instance { get; private set; }
 
     public bool IsInitialized => _isInitialized;
+
+    public event Action<BAUnitViewModel> UnitBound;
 
     private void Awake()
     {
@@ -68,8 +71,37 @@ public class BABattleManager : MonoBehaviour
         unitView.Bind(unitViewModel);
         unitView.ResetState();
         _boundUnits.Add(unitView, unitViewModel);
+        UnitBound?.Invoke(unitViewModel);
 
         return true;
+    }
+
+    public bool TryGetFirstUnitViewModelByType(
+        string unitType,
+        out BAUnitViewModel unitViewModel)
+    {
+        unitViewModel = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(unitType))
+        {
+            return false;
+        }
+
+        foreach (KeyValuePair<BAUnitView, BAUnitViewModel> boundUnit in _boundUnits)
+        {
+            if (boundUnit.Key == null || boundUnit.Value == null)
+            {
+                continue;
+            }
+
+            if (boundUnit.Value.UnitType == unitType)
+            {
+                unitViewModel = boundUnit.Value;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public bool TryFindNearestEnemy(BAUnitView requester, out BAUnitView target)

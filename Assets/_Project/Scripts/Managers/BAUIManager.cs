@@ -10,6 +10,8 @@ public class BAUIManager : MonoBehaviour
     private bool _isInitialized;
     private bool _isInitializing;
     private GameObject _battleHudInstance;
+    private BABattleHudView _battleHudView;
+    private BABattleHudViewModel _battleHudViewModel;
 
     public static BAUIManager Instance { get; private set; }
 
@@ -101,8 +103,72 @@ public class BAUIManager : MonoBehaviour
         return _isInitialized && battleHudInstance != null;
     }
 
+    public bool TryBindBattleHud(
+        BABattleManager battleManager,
+        BAStageManager stageManager)
+    {
+        if (!_isInitialized)
+        {
+            Debug.LogError("UI 매니저가 초기화되지 않아 전투 HUD를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (_battleHudInstance == null)
+        {
+            Debug.LogError("생성된 전투 HUD 인스턴스가 없어 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (battleManager == null || !battleManager.IsInitialized)
+        {
+            Debug.LogError("BABattleManager가 없거나 초기화되지 않아 전투 HUD를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (stageManager == null || !stageManager.IsInitialized)
+        {
+            Debug.LogError("BAStageManager가 없거나 초기화되지 않아 전투 HUD를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (_battleHudView != null && _battleHudViewModel != null)
+        {
+            return true;
+        }
+
+        BABattleHudView battleHudView = _battleHudInstance.GetComponent<BABattleHudView>();
+
+        if (battleHudView == null)
+        {
+            Debug.LogError("전투 HUD 루트에서 BABattleHudView 컴포넌트를 찾을 수 없습니다.");
+            return false;
+        }
+
+        BABattleHudViewModel battleHudViewModel =
+            new BABattleHudViewModel(battleManager, stageManager);
+
+        if (!battleHudView.Bind(battleHudViewModel))
+        {
+            battleHudViewModel.Dispose();
+            return false;
+        }
+
+        _battleHudView = battleHudView;
+        _battleHudViewModel = battleHudViewModel;
+        return true;
+    }
+
     private void OnDestroy()
     {
+        if (_battleHudView != null)
+        {
+            _battleHudView.Unbind();
+        }
+
+        _battleHudViewModel?.Dispose();
+        _battleHudView = null;
+        _battleHudViewModel = null;
+
         if (_battleHudInstance != null)
         {
             Destroy(_battleHudInstance);

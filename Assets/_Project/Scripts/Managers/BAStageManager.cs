@@ -14,8 +14,31 @@ public class BAStageManager : MonoBehaviour
 
     public bool IsInitialized => _isInitialized;
     public bool IsStageCleared => _isStageCleared;
+    public int RemainingEnemyCount
+    {
+        get
+        {
+            if (_enemySpawners == null)
+            {
+                return 0;
+            }
+
+            int remainingEnemyCount = 0;
+
+            foreach (BAEnemySpawner enemySpawner in _enemySpawners)
+            {
+                if (enemySpawner != null)
+                {
+                    remainingEnemyCount += enemySpawner.RemainingEnemyCount;
+                }
+            }
+
+            return Mathf.Max(0, remainingEnemyCount);
+        }
+    }
 
     public event Action StageCleared;
+    public event Action<int> RemainingEnemyCountChanged;
 
     private void Awake()
     {
@@ -61,9 +84,11 @@ public class BAStageManager : MonoBehaviour
         foreach (BAEnemySpawner enemySpawner in _enemySpawners)
         {
             enemySpawner.Cleared += OnSpawnerCleared;
+            enemySpawner.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         }
 
         _isInitialized = true;
+        RemainingEnemyCountChanged?.Invoke(RemainingEnemyCount);
         CheckStageCleared();
         return true;
     }
@@ -71,6 +96,11 @@ public class BAStageManager : MonoBehaviour
     private void OnSpawnerCleared()
     {
         CheckStageCleared();
+    }
+
+    private void OnRemainingEnemyCountChanged(int remainingEnemyCount)
+    {
+        RemainingEnemyCountChanged?.Invoke(RemainingEnemyCount);
     }
 
     private void CheckStageCleared()
@@ -102,6 +132,7 @@ public class BAStageManager : MonoBehaviour
                 if (enemySpawner != null)
                 {
                     enemySpawner.Cleared -= OnSpawnerCleared;
+                    enemySpawner.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
                 }
             }
         }

@@ -123,6 +123,12 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        if (!_uiManager.TryBindBattleHud(_battleManager, _stageManager))
+        {
+            Debug.LogError("전투 HUD 바인딩에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
         _isInitialized = true;
         Debug.Log("게임 초기화를 완료했습니다.");
     }

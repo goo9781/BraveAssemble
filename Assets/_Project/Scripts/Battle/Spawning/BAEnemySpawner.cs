@@ -17,14 +17,18 @@ public class BAEnemySpawner : MonoBehaviour
     private bool _isSpawnCompleted;
     private bool _isCleared;
     private int _spawnedCount;
+    private int _defeatedCount;
 
     public bool IsInitialized => _isInitialized;
     public bool IsSpawnCompleted => _isSpawnCompleted;
     public bool IsCleared => _isCleared;
     public int SpawnedCount => _spawnedCount;
+    public int RemainingEnemyCount =>
+        _spawnData == null ? 0 : Mathf.Max(0, _spawnData.TotalSpawnCount - _defeatedCount);
 
     public event Action SpawnCompleted;
     public event Action Cleared;
+    public event Action<int> RemainingEnemyCountChanged;
 
     private IEnumerator Start()
     {
@@ -107,6 +111,7 @@ public class BAEnemySpawner : MonoBehaviour
         }
 
         _isInitialized = true;
+        RemainingEnemyCountChanged?.Invoke(RemainingEnemyCount);
         StartCoroutine(SpawnEnemiesAsync());
     }
 
@@ -134,7 +139,16 @@ public class BAEnemySpawner : MonoBehaviour
 
             if (enemy != null)
             {
-                _spawnedEnemies.Add(enemy);
+                if (_spawnedEnemies.Add(enemy))
+                {
+                    BAUnitView unitView = enemy.GetComponent<BAUnitView>();
+
+                    if (unitView != null)
+                    {
+                        unitView.Died += OnEnemyDied;
+                    }
+                }
+
                 _spawnedCount++;
             }
 
@@ -153,6 +167,17 @@ public class BAEnemySpawner : MonoBehaviour
         Cleared?.Invoke();
     }
 
+    private void OnEnemyDied()
+    {
+        if (!_isInitialized || _spawnData == null)
+        {
+            return;
+        }
+
+        _defeatedCount = Mathf.Min(_defeatedCount + 1, _spawnData.TotalSpawnCount);
+        RemainingEnemyCountChanged?.Invoke(RemainingEnemyCount);
+    }
+
     private int CountActiveEnemies()
     {
         int activeEnemyCount = 0;
@@ -166,5 +191,23 @@ public class BAEnemySpawner : MonoBehaviour
         }
 
         return activeEnemyCount;
+    }
+
+    private void OnDestroy()
+    {
+        foreach (GameObject enemy in _spawnedEnemies)
+        {
+            if (enemy == null)
+            {
+                continue;
+            }
+
+            BAUnitView unitView = enemy.GetComponent<BAUnitView>();
+
+            if (unitView != null)
+            {
+                unitView.Died -= OnEnemyDied;
+            }
+        }
     }
 }

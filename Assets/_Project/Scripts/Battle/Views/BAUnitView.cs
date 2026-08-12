@@ -17,6 +17,8 @@ public class BAUnitView : MonoBehaviour
     public float CurrentHealth => _viewModel?.CurrentHealth ?? 0f;
     public bool IsDead => _viewModel == null || _viewModel.IsDead;
 
+    public event Action Died;
+
     public void Bind(BAUnitViewModel viewModel)
     {
         if (viewModel == null)
@@ -69,6 +71,7 @@ public class BAUnitView : MonoBehaviour
 
     private void OnDied()
     {
+        Died?.Invoke();
         gameObject.SetActive(false);
     }
 }
