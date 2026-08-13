@@ -75,6 +75,28 @@ public class BAGameManager : MonoBehaviour
         Application.Quit();
     }
 
+    public void PauseGame()
+    {
+        if (!_isInitialized || _currentState != BAGameState.Playing)
+        {
+            return;
+        }
+
+        Time.timeScale = 0f;
+        ChangeState(BAGameState.Paused);
+    }
+
+    public void ResumeGame()
+    {
+        if (_currentState != BAGameState.Paused)
+        {
+            return;
+        }
+
+        Time.timeScale = 1f;
+        ChangeState(BAGameState.Playing);
+    }
+
     private void OnDestroy()
     {
         if (_stageManager != null)

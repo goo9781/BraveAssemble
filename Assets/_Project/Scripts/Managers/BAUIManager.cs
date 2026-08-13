@@ -195,6 +195,10 @@ public class BAUIManager : MonoBehaviour
         _gameManager = gameManager;
         _battleHudViewModel.RestartRequested += OnRestartRequested;
         _battleHudViewModel.QuitRequested += OnQuitRequested;
+        _battleHudViewModel.PauseRequested += OnPauseRequested;
+        _battleHudViewModel.ResumeRequested += OnResumeRequested;
+        _gameManager.StateChanged += OnGameStateChanged;
+        _battleHudViewModel.UpdateGameState(_gameManager.CurrentState);
         _isBattleHudCommandsBound = true;
         return true;
     }
@@ -215,6 +219,30 @@ public class BAUIManager : MonoBehaviour
         }
     }
 
+    private void OnPauseRequested()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.PauseGame();
+        }
+    }
+
+    private void OnResumeRequested()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.ResumeGame();
+        }
+    }
+
+    private void OnGameStateChanged(BAGameState gameState)
+    {
+        if (_battleHudViewModel != null)
+        {
+            _battleHudViewModel.UpdateGameState(gameState);
+        }
+    }
+
     private void OnDestroy()
     {
         if (_battleHudView != null)
@@ -226,6 +254,13 @@ public class BAUIManager : MonoBehaviour
         {
             _battleHudViewModel.RestartRequested -= OnRestartRequested;
             _battleHudViewModel.QuitRequested -= OnQuitRequested;
+            _battleHudViewModel.PauseRequested -= OnPauseRequested;
+            _battleHudViewModel.ResumeRequested -= OnResumeRequested;
+        }
+
+        if (_gameManager != null)
+        {
+            _gameManager.StateChanged -= OnGameStateChanged;
         }
 
         _gameManager = null;

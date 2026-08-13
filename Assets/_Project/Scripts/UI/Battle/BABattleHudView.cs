@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +17,11 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private Button _skillButton;
     [SerializeField] private TMP_Text _skillNameText;
     [SerializeField] private TMP_Text _skillCooldownText;
+    [SerializeField] private Button _pauseButton;
+    [SerializeField] private GameObject _pausePanel;
+    [SerializeField] private Button _resumeButton;
+    [SerializeField] private Button _pauseRestartButton;
+    [SerializeField] private Button _pauseQuitButton;
 
     private BABattleHudViewModel _viewModel;
 
@@ -39,7 +44,12 @@ public class BABattleHudView : MonoBehaviour
             _gameOverQuitButton == null ||
             _skillButton == null ||
             _skillNameText == null ||
-            _skillCooldownText == null)
+            _skillCooldownText == null ||
+            _pauseButton == null ||
+            _pausePanel == null ||
+            _resumeButton == null ||
+            _pauseRestartButton == null ||
+            _pauseQuitButton == null)
         {
             Debug.LogError("전투 HUD의 Inspector 참조가 모두 설정되지 않았습니다.");
             return false;
@@ -53,12 +63,17 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.StageCleared += OnStageCleared;
         _viewModel.StageFailed += OnStageFailed;
         _viewModel.SkillCooldownChanged += OnSkillCooldownChanged;
+        _viewModel.PauseStateChanged += OnPauseStateChanged;
 
         _stageClearRestartButton.onClick.AddListener(OnRestartButtonClicked);
         _stageClearQuitButton.onClick.AddListener(OnQuitButtonClicked);
         _gameOverRestartButton.onClick.AddListener(OnRestartButtonClicked);
         _gameOverQuitButton.onClick.AddListener(OnQuitButtonClicked);
         _skillButton.onClick.AddListener(OnSkillButtonClicked);
+        _pauseButton.onClick.AddListener(OnPauseButtonClicked);
+        _resumeButton.onClick.AddListener(OnResumeButtonClicked);
+        _pauseRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _pauseQuitButton.onClick.AddListener(OnQuitButtonClicked);
 
         UpdateHeroHealth(_viewModel.HeroCurrentHealth, _viewModel.HeroMaxHealth);
         UpdateRemainingEnemyCount(_viewModel.RemainingEnemyCount);
@@ -68,6 +83,7 @@ public class BABattleHudView : MonoBehaviour
         UpdateSkillCooldown(
             _viewModel.SkillRemainingCooldown,
             _viewModel.SkillCooldown);
+        UpdatePauseState(_viewModel.IsPaused);
 
         return true;
     }
@@ -99,6 +115,26 @@ public class BABattleHudView : MonoBehaviour
             _skillButton.onClick.RemoveListener(OnSkillButtonClicked);
         }
 
+        if (_pauseButton != null)
+        {
+            _pauseButton.onClick.RemoveListener(OnPauseButtonClicked);
+        }
+
+        if (_resumeButton != null)
+        {
+            _resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
+        }
+
+        if (_pauseRestartButton != null)
+        {
+            _pauseRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        if (_pauseQuitButton != null)
+        {
+            _pauseQuitButton.onClick.RemoveListener(OnQuitButtonClicked);
+        }
+
         if (_viewModel != null)
         {
             _viewModel.HeroHealthChanged -= OnHeroHealthChanged;
@@ -106,6 +142,7 @@ public class BABattleHudView : MonoBehaviour
             _viewModel.StageCleared -= OnStageCleared;
             _viewModel.StageFailed -= OnStageFailed;
             _viewModel.SkillCooldownChanged -= OnSkillCooldownChanged;
+            _viewModel.PauseStateChanged -= OnPauseStateChanged;
         }
 
         _viewModel = null;
@@ -126,6 +163,16 @@ public class BABattleHudView : MonoBehaviour
         _viewModel?.RequestUseSkill();
     }
 
+    private void OnPauseButtonClicked()
+    {
+        _viewModel?.RequestPause();
+    }
+
+    private void OnResumeButtonClicked()
+    {
+        _viewModel?.RequestResume();
+    }
+
     private void OnHeroHealthChanged(float currentHealth, float maxHealth)
     {
         UpdateHeroHealth(currentHealth, maxHealth);
@@ -140,17 +187,26 @@ public class BABattleHudView : MonoBehaviour
     {
         _stageClearPanel.SetActive(true);
         _skillButton.interactable = false;
+        _pausePanel.SetActive(false);
+        _pauseButton.interactable = false;
     }
 
     private void OnStageFailed()
     {
         _gameOverPanel.SetActive(true);
         _skillButton.interactable = false;
+        _pausePanel.SetActive(false);
+        _pauseButton.interactable = false;
     }
 
     private void OnSkillCooldownChanged(float remainingCooldown, float cooldown)
     {
         UpdateSkillCooldown(remainingCooldown, cooldown);
+    }
+
+    private void OnPauseStateChanged(bool isPaused)
+    {
+        UpdatePauseState(isPaused);
     }
 
     private void UpdateHeroHealth(float currentHealth, float maxHealth)
@@ -186,6 +242,22 @@ public class BABattleHudView : MonoBehaviour
         }
 
         _skillButton.interactable = _viewModel != null && _viewModel.CanUseSkill;
+    }
+
+    private void UpdatePauseState(bool isPaused)
+    {
+        _pausePanel.SetActive(isPaused);
+
+        _skillButton.interactable =
+            !isPaused &&
+            _viewModel != null &&
+            _viewModel.CanUseSkill;
+
+        _pauseButton.interactable =
+            !isPaused &&
+            _viewModel != null &&
+            !_viewModel.IsStageCleared &&
+            !_viewModel.IsStageFailed;
     }
 
     private void OnDestroy()
