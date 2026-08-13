@@ -1119,6 +1119,7 @@ MonoBehaviour:
   _poolManager: {fileID: 1925561591}
   _battleManager: {fileID: 245381411}
   _stageManager: {fileID: 1505533780}
+  _uiManager: {fileID: 865788484}
 --- !u!1 &1925561589
 GameObject:
   m_ObjectHideFlags: 0

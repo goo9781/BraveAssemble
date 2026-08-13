@@ -5,15 +5,23 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BAStageManager : MonoBehaviour
 {
+    private const string _heroUnitType = "Hero";
+
     [SerializeField] private List<BAEnemySpawner> _enemySpawners = new List<BAEnemySpawner>();
 
+    private BABattleManager _battleManager;
+    private BAUnitViewModel _heroViewModel;
     private bool _isInitialized;
+    private bool _isBattleResultBound;
     private bool _isStageCleared;
+    private bool _isStageFailed;
 
     public static BAStageManager Instance { get; private set; }
 
     public bool IsInitialized => _isInitialized;
     public bool IsStageCleared => _isStageCleared;
+    public bool IsStageFailed => _isStageFailed;
+    public bool IsStageEnded => _isStageCleared || _isStageFailed;
     public int RemainingEnemyCount
     {
         get
@@ -38,6 +46,7 @@ public class BAStageManager : MonoBehaviour
     }
 
     public event Action StageCleared;
+    public event Action StageFailed;
     public event Action<int> RemainingEnemyCountChanged;
 
     private void Awake()
@@ -93,6 +102,45 @@ public class BAStageManager : MonoBehaviour
         return true;
     }
 
+    public bool TryBindBattleResult(BABattleManager battleManager)
+    {
+        if (!_isInitialized)
+        {
+            Debug.LogError("스테이지 매니저가 초기화되지 않아 전투 결과를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (battleManager == null)
+        {
+            Debug.LogError("BABattleManager가 없어 전투 결과를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (!battleManager.IsInitialized)
+        {
+            Debug.LogError("BABattleManager가 초기화되지 않아 전투 결과를 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (_isBattleResultBound)
+        {
+            return true;
+        }
+
+        _battleManager = battleManager;
+        _battleManager.UnitBound += OnUnitBound;
+
+        if (_battleManager.TryGetFirstUnitViewModelByType(
+                _heroUnitType,
+                out BAUnitViewModel heroViewModel))
+        {
+            BindHeroViewModel(heroViewModel);
+        }
+
+        _isBattleResultBound = true;
+        return true;
+    }
+
     private void OnSpawnerCleared()
     {
         CheckStageCleared();
@@ -103,9 +151,47 @@ public class BAStageManager : MonoBehaviour
         RemainingEnemyCountChanged?.Invoke(RemainingEnemyCount);
     }
 
+    private void OnUnitBound(BAUnitViewModel unitViewModel)
+    {
+        if (unitViewModel == null || unitViewModel.UnitType != _heroUnitType)
+        {
+            return;
+        }
+
+        BindHeroViewModel(unitViewModel);
+    }
+
+    private void BindHeroViewModel(BAUnitViewModel heroViewModel)
+    {
+        if (_heroViewModel == heroViewModel)
+        {
+            return;
+        }
+
+        if (_heroViewModel != null)
+        {
+            _heroViewModel.Died -= OnHeroDied;
+        }
+
+        _heroViewModel = heroViewModel;
+        _heroViewModel.Died += OnHeroDied;
+    }
+
+    private void OnHeroDied()
+    {
+        if (!_isBattleResultBound || _isStageCleared || _isStageFailed)
+        {
+            return;
+        }
+
+        _isStageFailed = true;
+        Debug.Log("스테이지에 실패했습니다.");
+        StageFailed?.Invoke();
+    }
+
     private void CheckStageCleared()
     {
-        if (!_isInitialized || _isStageCleared)
+        if (!_isInitialized || _isStageCleared || _isStageFailed)
         {
             return;
         }
@@ -125,6 +211,16 @@ public class BAStageManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_battleManager != null)
+        {
+            _battleManager.UnitBound -= OnUnitBound;
+        }
+
+        if (_heroViewModel != null)
+        {
+            _heroViewModel.Died -= OnHeroDied;
+        }
+
         if (_enemySpawners != null)
         {
             foreach (BAEnemySpawner enemySpawner in _enemySpawners)

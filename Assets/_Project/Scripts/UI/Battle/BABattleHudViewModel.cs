@@ -14,10 +14,12 @@ public class BABattleHudViewModel : IDisposable
     public float HeroCurrentHealth => _heroViewModel?.CurrentHealth ?? 0f;
     public int RemainingEnemyCount => _stageManager.RemainingEnemyCount;
     public bool IsStageCleared => _stageManager.IsStageCleared;
+    public bool IsStageFailed => _stageManager.IsStageFailed;
 
     public event Action<float, float> HeroHealthChanged;
     public event Action<int> RemainingEnemyCountChanged;
     public event Action StageCleared;
+    public event Action StageFailed;
 
     public BABattleHudViewModel(
         BABattleManager battleManager,
@@ -29,6 +31,7 @@ public class BABattleHudViewModel : IDisposable
         _battleManager.UnitBound += OnUnitBound;
         _stageManager.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         _stageManager.StageCleared += OnStageCleared;
+        _stageManager.StageFailed += OnStageFailed;
 
         if (_battleManager.TryGetFirstUnitViewModelByType(
                 _heroUnitType,
@@ -48,6 +51,7 @@ public class BABattleHudViewModel : IDisposable
         _battleManager.UnitBound -= OnUnitBound;
         _stageManager.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
         _stageManager.StageCleared -= OnStageCleared;
+        _stageManager.StageFailed -= OnStageFailed;
 
         if (_heroViewModel != null)
         {
@@ -93,5 +97,10 @@ public class BABattleHudViewModel : IDisposable
     private void OnStageCleared()
     {
         StageCleared?.Invoke();
+    }
+
+    private void OnStageFailed()
+    {
+        StageFailed?.Invoke();
     }
 }

@@ -9,6 +9,7 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private TMP_Text _heroHpText;
     [SerializeField] private TMP_Text _remainingEnemyText;
     [SerializeField] private GameObject _stageClearPanel;
+    [SerializeField] private GameObject _gameOverPanel;
 
     private BABattleHudViewModel _viewModel;
 
@@ -23,7 +24,8 @@ public class BABattleHudView : MonoBehaviour
         if (_heroHpSlider == null ||
             _heroHpText == null ||
             _remainingEnemyText == null ||
-            _stageClearPanel == null)
+            _stageClearPanel == null ||
+            _gameOverPanel == null)
         {
             Debug.LogError("전투 HUD의 Inspector 참조가 모두 설정되지 않았습니다.");
             return false;
@@ -35,10 +37,12 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.HeroHealthChanged += OnHeroHealthChanged;
         _viewModel.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         _viewModel.StageCleared += OnStageCleared;
+        _viewModel.StageFailed += OnStageFailed;
 
         UpdateHeroHealth(_viewModel.HeroCurrentHealth, _viewModel.HeroMaxHealth);
         UpdateRemainingEnemyCount(_viewModel.RemainingEnemyCount);
         _stageClearPanel.SetActive(_viewModel.IsStageCleared);
+        _gameOverPanel.SetActive(_viewModel.IsStageFailed);
 
         return true;
     }
@@ -53,6 +57,7 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.HeroHealthChanged -= OnHeroHealthChanged;
         _viewModel.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
         _viewModel.StageCleared -= OnStageCleared;
+        _viewModel.StageFailed -= OnStageFailed;
         _viewModel = null;
     }
 
@@ -69,6 +74,11 @@ public class BABattleHudView : MonoBehaviour
     private void OnStageCleared()
     {
         _stageClearPanel.SetActive(true);
+    }
+
+    private void OnStageFailed()
+    {
+        _gameOverPanel.SetActive(true);
     }
 
     private void UpdateHeroHealth(float currentHealth, float maxHealth)

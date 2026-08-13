@@ -109,6 +109,12 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        if (!_stageManager.TryBindBattleResult(_battleManager))
+        {
+            Debug.LogError("전투 결과 바인딩에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
         if (_uiManager == null)
         {
             Debug.LogError("BAUIManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
