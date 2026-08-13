@@ -12,6 +12,8 @@ public class BAUIManager : MonoBehaviour
     private GameObject _battleHudInstance;
     private BABattleHudView _battleHudView;
     private BABattleHudViewModel _battleHudViewModel;
+    private BAGameManager _gameManager;
+    private bool _isBattleHudCommandsBound;
 
     public static BAUIManager Instance { get; private set; }
 
@@ -158,6 +160,54 @@ public class BAUIManager : MonoBehaviour
         return true;
     }
 
+    public bool TryBindBattleHudCommands(BAGameManager gameManager)
+    {
+        if (!_isInitialized)
+        {
+            Debug.LogError("UI 매니저가 초기화되지 않아 전투 HUD 명령을 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (_battleHudViewModel == null)
+        {
+            Debug.LogError("전투 HUD ViewModel이 없어 명령을 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (gameManager == null)
+        {
+            Debug.LogError("BAGameManager가 없어 전투 HUD 명령을 바인딩할 수 없습니다.");
+            return false;
+        }
+
+        if (_isBattleHudCommandsBound)
+        {
+            return true;
+        }
+
+        _gameManager = gameManager;
+        _battleHudViewModel.RestartRequested += OnRestartRequested;
+        _battleHudViewModel.QuitRequested += OnQuitRequested;
+        _isBattleHudCommandsBound = true;
+        return true;
+    }
+
+    private void OnRestartRequested()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.RestartGame();
+        }
+    }
+
+    private void OnQuitRequested()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.QuitGame();
+        }
+    }
+
     private void OnDestroy()
     {
         if (_battleHudView != null)
@@ -165,6 +215,14 @@ public class BAUIManager : MonoBehaviour
             _battleHudView.Unbind();
         }
 
+        if (_battleHudViewModel != null)
+        {
+            _battleHudViewModel.RestartRequested -= OnRestartRequested;
+            _battleHudViewModel.QuitRequested -= OnQuitRequested;
+        }
+
+        _gameManager = null;
+        _isBattleHudCommandsBound = false;
         _battleHudViewModel?.Dispose();
         _battleHudView = null;
         _battleHudViewModel = null;

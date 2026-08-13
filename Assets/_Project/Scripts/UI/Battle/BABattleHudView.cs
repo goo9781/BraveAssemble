@@ -10,6 +10,10 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private TMP_Text _remainingEnemyText;
     [SerializeField] private GameObject _stageClearPanel;
     [SerializeField] private GameObject _gameOverPanel;
+    [SerializeField] private Button _stageClearRestartButton;
+    [SerializeField] private Button _stageClearQuitButton;
+    [SerializeField] private Button _gameOverRestartButton;
+    [SerializeField] private Button _gameOverQuitButton;
 
     private BABattleHudViewModel _viewModel;
 
@@ -25,7 +29,11 @@ public class BABattleHudView : MonoBehaviour
             _heroHpText == null ||
             _remainingEnemyText == null ||
             _stageClearPanel == null ||
-            _gameOverPanel == null)
+            _gameOverPanel == null ||
+            _stageClearRestartButton == null ||
+            _stageClearQuitButton == null ||
+            _gameOverRestartButton == null ||
+            _gameOverQuitButton == null)
         {
             Debug.LogError("전투 HUD의 Inspector 참조가 모두 설정되지 않았습니다.");
             return false;
@@ -39,6 +47,11 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.StageCleared += OnStageCleared;
         _viewModel.StageFailed += OnStageFailed;
 
+        _stageClearRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _stageClearQuitButton.onClick.AddListener(OnQuitButtonClicked);
+        _gameOverRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _gameOverQuitButton.onClick.AddListener(OnQuitButtonClicked);
+
         UpdateHeroHealth(_viewModel.HeroCurrentHealth, _viewModel.HeroMaxHealth);
         UpdateRemainingEnemyCount(_viewModel.RemainingEnemyCount);
         _stageClearPanel.SetActive(_viewModel.IsStageCleared);
@@ -49,16 +62,45 @@ public class BABattleHudView : MonoBehaviour
 
     public void Unbind()
     {
-        if (_viewModel == null)
+        if (_stageClearRestartButton != null)
         {
-            return;
+            _stageClearRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
         }
 
-        _viewModel.HeroHealthChanged -= OnHeroHealthChanged;
-        _viewModel.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
-        _viewModel.StageCleared -= OnStageCleared;
-        _viewModel.StageFailed -= OnStageFailed;
+        if (_stageClearQuitButton != null)
+        {
+            _stageClearQuitButton.onClick.RemoveListener(OnQuitButtonClicked);
+        }
+
+        if (_gameOverRestartButton != null)
+        {
+            _gameOverRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        if (_gameOverQuitButton != null)
+        {
+            _gameOverQuitButton.onClick.RemoveListener(OnQuitButtonClicked);
+        }
+
+        if (_viewModel != null)
+        {
+            _viewModel.HeroHealthChanged -= OnHeroHealthChanged;
+            _viewModel.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
+            _viewModel.StageCleared -= OnStageCleared;
+            _viewModel.StageFailed -= OnStageFailed;
+        }
+
         _viewModel = null;
+    }
+
+    private void OnRestartButtonClicked()
+    {
+        _viewModel?.RequestRestart();
+    }
+
+    private void OnQuitButtonClicked()
+    {
+        _viewModel?.RequestQuit();
     }
 
     private void OnHeroHealthChanged(float currentHealth, float maxHealth)

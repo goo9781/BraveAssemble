@@ -20,6 +20,8 @@ public class BABattleHudViewModel : IDisposable
     public event Action<int> RemainingEnemyCountChanged;
     public event Action StageCleared;
     public event Action StageFailed;
+    public event Action RestartRequested;
+    public event Action QuitRequested;
 
     public BABattleHudViewModel(
         BABattleManager battleManager,
@@ -41,6 +43,26 @@ public class BABattleHudViewModel : IDisposable
         }
     }
 
+    public void RequestRestart()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        RestartRequested?.Invoke();
+    }
+
+    public void RequestQuit()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        QuitRequested?.Invoke();
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -60,6 +82,8 @@ public class BABattleHudViewModel : IDisposable
         }
 
         _isDisposed = true;
+        RestartRequested = null;
+        QuitRequested = null;
     }
 
     private void OnUnitBound(BAUnitViewModel unitViewModel)
