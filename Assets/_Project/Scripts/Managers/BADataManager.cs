@@ -7,6 +7,7 @@ public class BADataManager : MonoBehaviour
 {
     private const string _unitTableResourcePath = "JsonOutput/UnitTable";
     private const string _enemySpawnTableResourcePath = "JsonOutput/EnemySpawnTable";
+    private const string _skillTableResourcePath = "JsonOutput/SkillTable";
 
     [Serializable]
     private class SerializationWrapper<T> where T : BAGameDataBase
@@ -17,6 +18,8 @@ public class BADataManager : MonoBehaviour
     private readonly Dictionary<string, BAUnitData> _unitDataById = new Dictionary<string, BAUnitData>();
     private readonly Dictionary<string, BAEnemySpawnData> _enemySpawnDataById =
         new Dictionary<string, BAEnemySpawnData>();
+    private readonly Dictionary<string, BASkillData> _skillDataById =
+        new Dictionary<string, BASkillData>();
 
     private bool _isInitialized;
     private bool _isInitializing;
@@ -67,6 +70,7 @@ public class BADataManager : MonoBehaviour
         _isInitializing = true;
         bool unitTableLoaded = false;
         bool enemySpawnTableLoaded = false;
+        bool skillTableLoaded = false;
 
         yield return LoadTableAsync(
             _unitTableResourcePath,
@@ -85,6 +89,17 @@ public class BADataManager : MonoBehaviour
             succeeded => enemySpawnTableLoaded = succeeded);
 
         if (!enemySpawnTableLoaded)
+        {
+            _isInitializing = false;
+            yield break;
+        }
+
+        yield return LoadTableAsync(
+            _skillTableResourcePath,
+            _skillDataById,
+            succeeded => skillTableLoaded = succeeded);
+
+        if (!skillTableLoaded)
         {
             _isInitializing = false;
             yield break;
@@ -116,6 +131,18 @@ public class BADataManager : MonoBehaviour
         }
 
         return _enemySpawnDataById.TryGetValue(id, out enemySpawnData);
+    }
+
+    public bool TryGetSkillData(string id, out BASkillData skillData)
+    {
+        skillData = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        return _skillDataById.TryGetValue(id, out skillData);
     }
 
     private IEnumerator LoadTableAsync<T>(

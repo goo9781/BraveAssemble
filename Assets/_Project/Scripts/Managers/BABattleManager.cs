@@ -104,6 +104,100 @@ public class BABattleManager : MonoBehaviour
         return false;
     }
 
+    public bool TryGetFirstActiveUnitByType(
+        string unitType,
+        out BAUnitView unitView)
+    {
+        unitView = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(unitType))
+        {
+            return false;
+        }
+
+        foreach (BAUnitView boundUnitView in _boundUnits.Keys)
+        {
+            if (boundUnitView == null ||
+                !boundUnitView.gameObject.activeInHierarchy ||
+                boundUnitView.IsDead)
+            {
+                continue;
+            }
+
+            if (boundUnitView.UnitType == unitType)
+            {
+                unitView = boundUnitView;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool TryApplyAreaDamage(
+        BAUnitView requester,
+        float range,
+        int maxTargetCount,
+        float damage,
+        out int hitCount)
+    {
+        hitCount = 0;
+
+        if (!_isInitialized ||
+            requester == null ||
+            !_boundUnits.ContainsKey(requester) ||
+            !requester.gameObject.activeInHierarchy ||
+            requester.IsDead ||
+            range <= 0f ||
+            maxTargetCount <= 0 ||
+            damage <= 0f)
+        {
+            return false;
+        }
+
+        Vector2 requesterPosition = requester.transform.position;
+        float rangeSquared = range * range;
+        List<BAUnitView> targets = new List<BAUnitView>();
+
+        foreach (BAUnitView candidate in _boundUnits.Keys)
+        {
+            if (candidate == requester ||
+                candidate == null ||
+                !candidate.gameObject.activeInHierarchy ||
+                candidate.IsDead ||
+                candidate.UnitType == requester.UnitType)
+            {
+                continue;
+            }
+
+            Vector2 candidatePosition = candidate.transform.position;
+
+            if ((candidatePosition - requesterPosition).sqrMagnitude <= rangeSquared)
+            {
+                targets.Add(candidate);
+            }
+        }
+
+        targets.Sort((left, right) =>
+        {
+            float leftDistanceSquared =
+                ((Vector2)left.transform.position - requesterPosition).sqrMagnitude;
+            float rightDistanceSquared =
+                ((Vector2)right.transform.position - requesterPosition).sqrMagnitude;
+            return leftDistanceSquared.CompareTo(rightDistanceSquared);
+        });
+
+        int targetCount = Mathf.Min(maxTargetCount, targets.Count);
+
+        for (int index = 0; index < targetCount; index++)
+        {
+            targets[index].TakeDamage(damage);
+            hitCount++;
+        }
+
+        return hitCount > 0;
+    }
+
     public bool TryFindNearestEnemy(BAUnitView requester, out BAUnitView target)
     {
         target = null;

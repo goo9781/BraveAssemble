@@ -6,6 +6,7 @@ public class BABattleHudViewModel : IDisposable
 
     private readonly BABattleManager _battleManager;
     private readonly BAStageManager _stageManager;
+    private readonly BASkillManager _skillManager;
 
     private BAUnitViewModel _heroViewModel;
     private bool _isDisposed;
@@ -15,6 +16,10 @@ public class BABattleHudViewModel : IDisposable
     public int RemainingEnemyCount => _stageManager.RemainingEnemyCount;
     public bool IsStageCleared => _stageManager.IsStageCleared;
     public bool IsStageFailed => _stageManager.IsStageFailed;
+    public string SkillDisplayName => _skillManager.DisplayName;
+    public float SkillCooldown => _skillManager.Cooldown;
+    public float SkillRemainingCooldown => _skillManager.RemainingCooldown;
+    public bool CanUseSkill => _skillManager.CanUse;
 
     public event Action<float, float> HeroHealthChanged;
     public event Action<int> RemainingEnemyCountChanged;
@@ -22,18 +27,27 @@ public class BABattleHudViewModel : IDisposable
     public event Action StageFailed;
     public event Action RestartRequested;
     public event Action QuitRequested;
+    public event Action<float, float> SkillCooldownChanged;
 
     public BABattleHudViewModel(
         BABattleManager battleManager,
-        BAStageManager stageManager)
+        BAStageManager stageManager,
+        BASkillManager skillManager)
     {
         _battleManager = battleManager ?? throw new ArgumentNullException(nameof(battleManager));
         _stageManager = stageManager ?? throw new ArgumentNullException(nameof(stageManager));
+        _skillManager = skillManager ?? throw new ArgumentNullException(nameof(skillManager));
+
+        if (!_skillManager.IsInitialized)
+        {
+            throw new ArgumentException("스킬 매니저가 초기화되지 않았습니다.", nameof(skillManager));
+        }
 
         _battleManager.UnitBound += OnUnitBound;
         _stageManager.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         _stageManager.StageCleared += OnStageCleared;
         _stageManager.StageFailed += OnStageFailed;
+        _skillManager.CooldownChanged += OnSkillCooldownChanged;
 
         if (_battleManager.TryGetFirstUnitViewModelByType(
                 _heroUnitType,
@@ -63,6 +77,16 @@ public class BABattleHudViewModel : IDisposable
         QuitRequested?.Invoke();
     }
 
+    public void RequestUseSkill()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _skillManager.TryUseSkill();
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -74,6 +98,7 @@ public class BABattleHudViewModel : IDisposable
         _stageManager.RemainingEnemyCountChanged -= OnRemainingEnemyCountChanged;
         _stageManager.StageCleared -= OnStageCleared;
         _stageManager.StageFailed -= OnStageFailed;
+        _skillManager.CooldownChanged -= OnSkillCooldownChanged;
 
         if (_heroViewModel != null)
         {
@@ -126,5 +151,10 @@ public class BABattleHudViewModel : IDisposable
     private void OnStageFailed()
     {
         StageFailed?.Invoke();
+    }
+
+    private void OnSkillCooldownChanged(float remainingCooldown, float cooldown)
+    {
+        SkillCooldownChanged?.Invoke(remainingCooldown, cooldown);
     }
 }

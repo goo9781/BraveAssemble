@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "Skill_001",
+    "DisplayName": "브레이브 버스트",
+    "SkillType": "AreaDamage",
+    "DamageMultiplier": 3,
+    "Range": 5,
+    "MaxTargetCount": 5,
+    "Cooldown": 8
+  }
+]

@@ -21,6 +21,7 @@ public class BAGameManager : MonoBehaviour
     [SerializeField] private BAPoolManager _poolManager;
     [SerializeField] private BABattleManager _battleManager;
     [SerializeField] private BAStageManager _stageManager;
+    [SerializeField] private BASkillManager _skillManager;
     [SerializeField] private BAUIManager _uiManager;
 
     private bool _isInitialized;
@@ -166,6 +167,18 @@ public class BAGameManager : MonoBehaviour
         _stageManager.StageCleared += OnStageCleared;
         _stageManager.StageFailed += OnStageFailed;
 
+        if (_skillManager == null)
+        {
+            Debug.LogError("BASkillManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (!_skillManager.Initialize(_dataManager, _battleManager, _stageManager))
+        {
+            Debug.LogError("스킬 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
         if (_uiManager == null)
         {
             Debug.LogError("BAUIManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
@@ -180,7 +193,7 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
-        if (!_uiManager.TryBindBattleHud(_battleManager, _stageManager))
+        if (!_uiManager.TryBindBattleHud(_battleManager, _stageManager, _skillManager))
         {
             Debug.LogError("전투 HUD 바인딩에 실패하여 게임 초기화를 중단합니다.");
             yield break;
