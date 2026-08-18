@@ -115,7 +115,19 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
             return;
         }
 
-        _target.TakeDamage(_unitView.AttackDamage);
+        if (BABattleManager.Instance == null)
+        {
+            return;
+        }
+
+        if (!BABattleManager.Instance.TryApplyDamage(
+                _unitView,
+                _target,
+                _unitView.AttackDamage))
+        {
+            return;
+        }
+
         _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
     }
 

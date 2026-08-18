@@ -16,6 +16,7 @@ public class BABattleManager : MonoBehaviour
     public bool IsInitialized => _isInitialized;
 
     public event Action<BAUnitViewModel> UnitBound;
+    public event Action<BAUnitView, BAUnitView, float> DamageApplied;
 
     private void Awake()
     {
@@ -134,6 +135,32 @@ public class BABattleManager : MonoBehaviour
         return false;
     }
 
+    public bool TryApplyDamage(
+        BAUnitView attacker,
+        BAUnitView target,
+        float damage)
+    {
+        if (!_isInitialized ||
+            attacker == null ||
+            target == null ||
+            !_boundUnits.ContainsKey(attacker) ||
+            !_boundUnits.ContainsKey(target) ||
+            !attacker.gameObject.activeInHierarchy ||
+            !target.gameObject.activeInHierarchy ||
+            attacker.IsDead ||
+            target.IsDead ||
+            attacker == target ||
+            attacker.UnitType == target.UnitType ||
+            damage <= 0f)
+        {
+            return false;
+        }
+
+        target.TakeDamage(damage);
+        DamageApplied?.Invoke(attacker, target, damage);
+        return true;
+    }
+
     public bool TryApplyAreaDamage(
         BAUnitView requester,
         float range,
@@ -191,8 +218,10 @@ public class BABattleManager : MonoBehaviour
 
         for (int index = 0; index < targetCount; index++)
         {
-            targets[index].TakeDamage(damage);
-            hitCount++;
+            if (TryApplyDamage(requester, targets[index], damage))
+            {
+                hitCount++;
+            }
         }
 
         return hitCount > 0;
