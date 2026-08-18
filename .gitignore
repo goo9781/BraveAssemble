@@ -59,3 +59,7 @@ crashlytics-build.properties
 # Keep Unity metadata tracked
 !*.meta
 !**/*.meta
+
+# Addressables temporary link file
+/Assets/AddressableAssetsData/link.xml
+/Assets/AddressableAssetsData/link.xml.meta
