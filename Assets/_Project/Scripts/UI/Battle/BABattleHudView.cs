@@ -22,6 +22,10 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _pauseRestartButton;
     [SerializeField] private Button _pauseQuitButton;
+    [SerializeField] private Slider _assembleGaugeSlider;
+    [SerializeField] private Button _assembleButton;
+    [SerializeField] private TMP_Text _assembleNameText;
+    [SerializeField] private TMP_Text _assembleDurationText;
 
     private BABattleHudViewModel _viewModel;
 
@@ -49,7 +53,11 @@ public class BABattleHudView : MonoBehaviour
             _pausePanel == null ||
             _resumeButton == null ||
             _pauseRestartButton == null ||
-            _pauseQuitButton == null)
+            _pauseQuitButton == null ||
+            _assembleGaugeSlider == null ||
+            _assembleButton == null ||
+            _assembleNameText == null ||
+            _assembleDurationText == null)
         {
             Debug.LogError("전투 HUD의 Inspector 참조가 모두 설정되지 않았습니다.");
             return false;
@@ -64,6 +72,9 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.StageFailed += OnStageFailed;
         _viewModel.SkillCooldownChanged += OnSkillCooldownChanged;
         _viewModel.PauseStateChanged += OnPauseStateChanged;
+        _viewModel.AssembleGaugeChanged += OnAssembleGaugeChanged;
+        _viewModel.AssembleDurationChanged += OnAssembleDurationChanged;
+        _viewModel.AssembleStateChanged += OnAssembleStateChanged;
 
         _stageClearRestartButton.onClick.AddListener(OnRestartButtonClicked);
         _stageClearQuitButton.onClick.AddListener(OnQuitButtonClicked);
@@ -74,6 +85,7 @@ public class BABattleHudView : MonoBehaviour
         _resumeButton.onClick.AddListener(OnResumeButtonClicked);
         _pauseRestartButton.onClick.AddListener(OnRestartButtonClicked);
         _pauseQuitButton.onClick.AddListener(OnQuitButtonClicked);
+        _assembleButton.onClick.AddListener(OnAssembleButtonClicked);
 
         UpdateHeroHealth(_viewModel.HeroCurrentHealth, _viewModel.HeroMaxHealth);
         UpdateRemainingEnemyCount(_viewModel.RemainingEnemyCount);
@@ -83,6 +95,14 @@ public class BABattleHudView : MonoBehaviour
         UpdateSkillCooldown(
             _viewModel.SkillRemainingCooldown,
             _viewModel.SkillCooldown);
+        _assembleNameText.text = _viewModel.AssembleDisplayName;
+        UpdateAssembleGauge(
+            _viewModel.AssembleCurrentGauge,
+            _viewModel.AssembleMaxGauge);
+        UpdateAssembleDuration(
+            _viewModel.AssembleRemainingDuration,
+            _viewModel.AssembleDuration);
+        UpdateAssembleButtonState();
         UpdatePauseState(_viewModel.IsPaused);
 
         return true;
@@ -135,6 +155,11 @@ public class BABattleHudView : MonoBehaviour
             _pauseQuitButton.onClick.RemoveListener(OnQuitButtonClicked);
         }
 
+        if (_assembleButton != null)
+        {
+            _assembleButton.onClick.RemoveListener(OnAssembleButtonClicked);
+        }
+
         if (_viewModel != null)
         {
             _viewModel.HeroHealthChanged -= OnHeroHealthChanged;
@@ -143,6 +168,9 @@ public class BABattleHudView : MonoBehaviour
             _viewModel.StageFailed -= OnStageFailed;
             _viewModel.SkillCooldownChanged -= OnSkillCooldownChanged;
             _viewModel.PauseStateChanged -= OnPauseStateChanged;
+            _viewModel.AssembleGaugeChanged -= OnAssembleGaugeChanged;
+            _viewModel.AssembleDurationChanged -= OnAssembleDurationChanged;
+            _viewModel.AssembleStateChanged -= OnAssembleStateChanged;
         }
 
         _viewModel = null;
@@ -173,6 +201,11 @@ public class BABattleHudView : MonoBehaviour
         _viewModel?.RequestResume();
     }
 
+    private void OnAssembleButtonClicked()
+    {
+        _viewModel?.RequestAssemble();
+    }
+
     private void OnHeroHealthChanged(float currentHealth, float maxHealth)
     {
         UpdateHeroHealth(currentHealth, maxHealth);
@@ -189,6 +222,8 @@ public class BABattleHudView : MonoBehaviour
         _skillButton.interactable = false;
         _pausePanel.SetActive(false);
         _pauseButton.interactable = false;
+        _assembleButton.interactable = false;
+        _assembleButton.gameObject.SetActive(false);
     }
 
     private void OnStageFailed()
@@ -197,6 +232,8 @@ public class BABattleHudView : MonoBehaviour
         _skillButton.interactable = false;
         _pausePanel.SetActive(false);
         _pauseButton.interactable = false;
+        _assembleButton.interactable = false;
+        _assembleButton.gameObject.SetActive(false);
     }
 
     private void OnSkillCooldownChanged(float remainingCooldown, float cooldown)
@@ -207,6 +244,35 @@ public class BABattleHudView : MonoBehaviour
     private void OnPauseStateChanged(bool isPaused)
     {
         UpdatePauseState(isPaused);
+    }
+
+    private void OnAssembleGaugeChanged(float currentGauge, float maxGauge)
+    {
+        UpdateAssembleGauge(currentGauge, maxGauge);
+    }
+
+    private void OnAssembleDurationChanged(float remainingDuration, float duration)
+    {
+        UpdateAssembleDuration(remainingDuration, duration);
+    }
+
+    private void OnAssembleStateChanged(bool isAssembled)
+    {
+        if (isAssembled)
+        {
+            UpdateAssembleDuration(
+                _viewModel.AssembleRemainingDuration,
+                _viewModel.AssembleDuration);
+        }
+        else
+        {
+            _assembleDurationText.text = string.Empty;
+            UpdateAssembleGauge(
+                _viewModel.AssembleCurrentGauge,
+                _viewModel.AssembleMaxGauge);
+        }
+
+        UpdateAssembleButtonState();
     }
 
     private void UpdateHeroHealth(float currentHealth, float maxHealth)
@@ -258,6 +324,66 @@ public class BABattleHudView : MonoBehaviour
             _viewModel != null &&
             !_viewModel.IsStageCleared &&
             !_viewModel.IsStageFailed;
+
+        UpdateAssembleButtonState();
+    }
+
+    private void UpdateAssembleGauge(float currentGauge, float maxGauge)
+    {
+        if (_viewModel != null && _viewModel.IsAssembled)
+        {
+            UpdateAssembleButtonState();
+            return;
+        }
+
+        float clampedMaxGauge = Mathf.Max(0f, maxGauge);
+
+        _assembleGaugeSlider.minValue = 0f;
+        _assembleGaugeSlider.maxValue = Mathf.Max(1f, clampedMaxGauge);
+        _assembleGaugeSlider.value = Mathf.Clamp(currentGauge, 0f, clampedMaxGauge);
+        UpdateAssembleButtonState();
+    }
+
+    private void UpdateAssembleDuration(float remainingDuration, float duration)
+    {
+        if (_viewModel != null && _viewModel.IsAssembled)
+        {
+            float clampedDuration = Mathf.Max(0f, duration);
+            float clampedRemainingDuration = Mathf.Clamp(
+                remainingDuration,
+                0f,
+                clampedDuration);
+
+            _assembleGaugeSlider.minValue = 0f;
+            _assembleGaugeSlider.maxValue = Mathf.Max(1f, clampedDuration);
+            _assembleGaugeSlider.value = clampedRemainingDuration;
+
+            if (clampedRemainingDuration > 0f)
+            {
+                _assembleDurationText.text = $"합체 {clampedRemainingDuration:F1}초";
+            }
+            else
+            {
+                _assembleDurationText.text = string.Empty;
+            }
+        }
+        else
+        {
+            _assembleDurationText.text = string.Empty;
+        }
+    }
+
+    private void UpdateAssembleButtonState()
+    {
+        bool canAssemble =
+            _viewModel != null &&
+            !_viewModel.IsPaused &&
+            !_viewModel.IsStageCleared &&
+            !_viewModel.IsStageFailed &&
+            _viewModel.CanAssemble;
+
+        _assembleButton.gameObject.SetActive(canAssemble);
+        _assembleButton.interactable = canAssemble;
     }
 
     private void OnDestroy()
