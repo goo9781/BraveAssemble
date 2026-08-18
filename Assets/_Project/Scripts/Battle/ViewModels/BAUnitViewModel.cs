@@ -38,6 +38,22 @@ public class BAUnitViewModel : IDisposable
         _model.RestoreHealth(amount);
     }
 
+    public bool ApplyCombatModifiers(
+        float attackDamageMultiplier,
+        float moveSpeedMultiplier,
+        float attackSpeedMultiplier)
+    {
+        return _model.ApplyCombatModifiers(
+            attackDamageMultiplier,
+            moveSpeedMultiplier,
+            attackSpeedMultiplier);
+    }
+
+    public void ResetCombatModifiers()
+    {
+        _model.ResetCombatModifiers();
+    }
+
     public void ResetState()
     {
         _model.ResetState();

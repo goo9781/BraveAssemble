@@ -53,6 +53,32 @@ public class BAUnitView : MonoBehaviour
         _viewModel?.RestoreHealth(amount);
     }
 
+    public bool ApplyCombatModifiers(
+        float attackDamageMultiplier,
+        float moveSpeedMultiplier,
+        float attackSpeedMultiplier)
+    {
+        if (_viewModel == null)
+        {
+            return false;
+        }
+
+        return _viewModel.ApplyCombatModifiers(
+            attackDamageMultiplier,
+            moveSpeedMultiplier,
+            attackSpeedMultiplier);
+    }
+
+    public void ResetCombatModifiers()
+    {
+        if (_viewModel == null)
+        {
+            return;
+        }
+
+        _viewModel.ResetCombatModifiers();
+    }
+
     public void ResetState()
     {
         if (_viewModel == null)

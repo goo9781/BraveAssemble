@@ -15,16 +15,22 @@ public class BAUnitModel
 
     private float _currentHealth;
     private bool _isDead;
+    private float _attackDamageMultiplier = 1f;
+    private float _moveSpeedMultiplier = 1f;
+    private float _attackSpeedMultiplier = 1f;
 
     public string Id => _id;
     public string DisplayName => _displayName;
     public string UnitType => _unitType;
     public float MaxHealth => _maxHealth;
-    public float AttackDamage => _attackDamage;
-    public float MoveSpeed => _moveSpeed;
+    public float AttackDamage => _attackDamage * _attackDamageMultiplier;
+    public float MoveSpeed => _moveSpeed * _moveSpeedMultiplier;
     public float DetectionRange => _detectionRange;
     public float AttackRange => _attackRange;
-    public float AttackInterval => _attackInterval;
+    public float AttackInterval =>
+        _attackSpeedMultiplier > 0f
+            ? _attackInterval / _attackSpeedMultiplier
+            : _attackInterval;
     public float CurrentHealth => _currentHealth;
     public bool IsDead => _isDead;
 
@@ -83,10 +89,36 @@ public class BAUnitModel
         HealthChanged?.Invoke(_currentHealth, _maxHealth);
     }
 
+    public bool ApplyCombatModifiers(
+        float attackDamageMultiplier,
+        float moveSpeedMultiplier,
+        float attackSpeedMultiplier)
+    {
+        if (attackDamageMultiplier <= 0f ||
+            moveSpeedMultiplier <= 0f ||
+            attackSpeedMultiplier <= 0f)
+        {
+            return false;
+        }
+
+        _attackDamageMultiplier = attackDamageMultiplier;
+        _moveSpeedMultiplier = moveSpeedMultiplier;
+        _attackSpeedMultiplier = attackSpeedMultiplier;
+        return true;
+    }
+
+    public void ResetCombatModifiers()
+    {
+        _attackDamageMultiplier = 1f;
+        _moveSpeedMultiplier = 1f;
+        _attackSpeedMultiplier = 1f;
+    }
+
     public void ResetState()
     {
         _currentHealth = _maxHealth;
         _isDead = false;
+        ResetCombatModifiers();
         HealthChanged?.Invoke(_currentHealth, _maxHealth);
     }
 }
