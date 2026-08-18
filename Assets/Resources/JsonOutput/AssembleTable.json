@@ -1,0 +1,13 @@
+[
+  {
+    "ID": "Assemble_001",
+    "DisplayName": "브레이브 어셈블",
+    "SupportPrefabKey": "Unit/Support/RhinoCarrier",
+    "MaxGauge": 100,
+    "GaugeGainPerHit": 20,
+    "Duration": 10,
+    "AttackDamageMultiplier": 2,
+    "MoveSpeedMultiplier": 1.25,
+    "AttackSpeedMultiplier": 1.5
+  }
+]

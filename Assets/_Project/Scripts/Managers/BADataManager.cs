@@ -8,6 +8,7 @@ public class BADataManager : MonoBehaviour
     private const string _unitTableResourcePath = "JsonOutput/UnitTable";
     private const string _enemySpawnTableResourcePath = "JsonOutput/EnemySpawnTable";
     private const string _skillTableResourcePath = "JsonOutput/SkillTable";
+    private const string _assembleTableResourcePath = "JsonOutput/AssembleTable";
 
     [Serializable]
     private class SerializationWrapper<T> where T : BAGameDataBase
@@ -20,6 +21,8 @@ public class BADataManager : MonoBehaviour
         new Dictionary<string, BAEnemySpawnData>();
     private readonly Dictionary<string, BASkillData> _skillDataById =
         new Dictionary<string, BASkillData>();
+    private readonly Dictionary<string, BAAssembleData> _assembleDataById =
+        new Dictionary<string, BAAssembleData>();
 
     private bool _isInitialized;
     private bool _isInitializing;
@@ -71,6 +74,7 @@ public class BADataManager : MonoBehaviour
         bool unitTableLoaded = false;
         bool enemySpawnTableLoaded = false;
         bool skillTableLoaded = false;
+        bool assembleTableLoaded = false;
 
         yield return LoadTableAsync(
             _unitTableResourcePath,
@@ -100,6 +104,17 @@ public class BADataManager : MonoBehaviour
             succeeded => skillTableLoaded = succeeded);
 
         if (!skillTableLoaded)
+        {
+            _isInitializing = false;
+            yield break;
+        }
+
+        yield return LoadTableAsync(
+            _assembleTableResourcePath,
+            _assembleDataById,
+            succeeded => assembleTableLoaded = succeeded);
+
+        if (!assembleTableLoaded)
         {
             _isInitializing = false;
             yield break;
@@ -143,6 +158,18 @@ public class BADataManager : MonoBehaviour
         }
 
         return _skillDataById.TryGetValue(id, out skillData);
+    }
+
+    public bool TryGetAssembleData(string id, out BAAssembleData assembleData)
+    {
+        assembleData = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        return _assembleDataById.TryGetValue(id, out assembleData);
     }
 
     private IEnumerator LoadTableAsync<T>(
