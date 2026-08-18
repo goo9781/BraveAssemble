@@ -6,6 +6,7 @@
     "MaxGauge": 100,
     "GaugeGainPerHit": 20,
     "Duration": 10,
+    "MaxUseCount": 1,
     "AttackDamageMultiplier": 2,
     "MoveSpeedMultiplier": 1.25,
     "AttackSpeedMultiplier": 1.5

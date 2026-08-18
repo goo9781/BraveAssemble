@@ -6,6 +6,7 @@ public class BAAssembleData : BAGameDataBase
     public float MaxGauge;
     public float GaugeGainPerHit;
     public float Duration;
+    public int MaxUseCount;
     public float AttackDamageMultiplier;
     public float MoveSpeedMultiplier;
     public float AttackSpeedMultiplier;
