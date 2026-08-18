@@ -108,7 +108,8 @@ public class BAUIManager : MonoBehaviour
     public bool TryBindBattleHud(
         BABattleManager battleManager,
         BAStageManager stageManager,
-        BASkillManager skillManager)
+        BASkillManager skillManager,
+        BAAssembleManager assembleManager)
     {
         if (!_isInitialized)
         {
@@ -140,6 +141,12 @@ public class BAUIManager : MonoBehaviour
             return false;
         }
 
+        if (assembleManager == null || !assembleManager.IsInitialized)
+        {
+            Debug.LogError("BAAssembleManager가 없거나 초기화되지 않아 전투 HUD를 바인딩할 수 없습니다.");
+            return false;
+        }
+
         if (_battleHudView != null && _battleHudViewModel != null)
         {
             return true;
@@ -154,7 +161,11 @@ public class BAUIManager : MonoBehaviour
         }
 
         BABattleHudViewModel battleHudViewModel =
-            new BABattleHudViewModel(battleManager, stageManager, skillManager);
+            new BABattleHudViewModel(
+                battleManager,
+                stageManager,
+                skillManager,
+                assembleManager);
 
         if (!battleHudView.Bind(battleHudViewModel))
         {

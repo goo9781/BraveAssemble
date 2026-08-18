@@ -7,6 +7,7 @@ public class BABattleHudViewModel : IDisposable
     private readonly BABattleManager _battleManager;
     private readonly BAStageManager _stageManager;
     private readonly BASkillManager _skillManager;
+    private readonly BAAssembleManager _assembleManager;
 
     private BAUnitViewModel _heroViewModel;
     private bool _isDisposed;
@@ -21,6 +22,13 @@ public class BABattleHudViewModel : IDisposable
     public float SkillCooldown => _skillManager.Cooldown;
     public float SkillRemainingCooldown => _skillManager.RemainingCooldown;
     public bool CanUseSkill => _skillManager.CanUse;
+    public string AssembleDisplayName => _assembleManager.DisplayName;
+    public float AssembleMaxGauge => _assembleManager.MaxGauge;
+    public float AssembleCurrentGauge => _assembleManager.CurrentGauge;
+    public float AssembleDuration => _assembleManager.Duration;
+    public float AssembleRemainingDuration => _assembleManager.RemainingDuration;
+    public bool IsAssembled => _assembleManager.IsAssembled;
+    public bool CanAssemble => _assembleManager.CanAssemble;
     public bool IsPaused => _isPaused;
 
     public event Action<float, float> HeroHealthChanged;
@@ -33,19 +41,29 @@ public class BABattleHudViewModel : IDisposable
     public event Action ResumeRequested;
     public event Action<bool> PauseStateChanged;
     public event Action<float, float> SkillCooldownChanged;
+    public event Action<float, float> AssembleGaugeChanged;
+    public event Action<float, float> AssembleDurationChanged;
+    public event Action<bool> AssembleStateChanged;
 
     public BABattleHudViewModel(
         BABattleManager battleManager,
         BAStageManager stageManager,
-        BASkillManager skillManager)
+        BASkillManager skillManager,
+        BAAssembleManager assembleManager)
     {
         _battleManager = battleManager ?? throw new ArgumentNullException(nameof(battleManager));
         _stageManager = stageManager ?? throw new ArgumentNullException(nameof(stageManager));
         _skillManager = skillManager ?? throw new ArgumentNullException(nameof(skillManager));
+        _assembleManager = assembleManager ?? throw new ArgumentNullException(nameof(assembleManager));
 
         if (!_skillManager.IsInitialized)
         {
             throw new ArgumentException("스킬 매니저가 초기화되지 않았습니다.", nameof(skillManager));
+        }
+
+        if (!_assembleManager.IsInitialized)
+        {
+            throw new ArgumentException("합체 매니저가 초기화되지 않았습니다.", nameof(assembleManager));
         }
 
         _battleManager.UnitBound += OnUnitBound;
@@ -53,6 +71,9 @@ public class BABattleHudViewModel : IDisposable
         _stageManager.StageCleared += OnStageCleared;
         _stageManager.StageFailed += OnStageFailed;
         _skillManager.CooldownChanged += OnSkillCooldownChanged;
+        _assembleManager.GaugeChanged += OnAssembleGaugeChanged;
+        _assembleManager.DurationChanged += OnAssembleDurationChanged;
+        _assembleManager.AssembleStateChanged += OnAssembleStateChanged;
 
         if (_battleManager.TryGetFirstUnitViewModelByType(
                 _heroUnitType,
@@ -90,6 +111,16 @@ public class BABattleHudViewModel : IDisposable
         }
 
         _skillManager.TryUseSkill();
+    }
+
+    public void RequestAssemble()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _assembleManager.TryStartAssemble();
     }
 
     public void RequestPause()
@@ -137,6 +168,9 @@ public class BABattleHudViewModel : IDisposable
         _stageManager.StageCleared -= OnStageCleared;
         _stageManager.StageFailed -= OnStageFailed;
         _skillManager.CooldownChanged -= OnSkillCooldownChanged;
+        _assembleManager.GaugeChanged -= OnAssembleGaugeChanged;
+        _assembleManager.DurationChanged -= OnAssembleDurationChanged;
+        _assembleManager.AssembleStateChanged -= OnAssembleStateChanged;
 
         if (_heroViewModel != null)
         {
@@ -196,5 +230,20 @@ public class BABattleHudViewModel : IDisposable
     private void OnSkillCooldownChanged(float remainingCooldown, float cooldown)
     {
         SkillCooldownChanged?.Invoke(remainingCooldown, cooldown);
+    }
+
+    private void OnAssembleGaugeChanged(float currentGauge, float maxGauge)
+    {
+        AssembleGaugeChanged?.Invoke(currentGauge, maxGauge);
+    }
+
+    private void OnAssembleDurationChanged(float remainingDuration, float duration)
+    {
+        AssembleDurationChanged?.Invoke(remainingDuration, duration);
+    }
+
+    private void OnAssembleStateChanged(bool isAssembled)
+    {
+        AssembleStateChanged?.Invoke(isAssembled);
     }
 }
