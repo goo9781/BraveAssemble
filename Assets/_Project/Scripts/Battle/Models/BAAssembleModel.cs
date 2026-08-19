@@ -8,12 +8,14 @@ public class BAAssembleModel
     private readonly float _maxGauge;
     private readonly float _gaugeGainPerHit;
     private readonly float _duration;
+    private readonly int _maxUseCount;
     private readonly float _attackDamageMultiplier;
     private readonly float _moveSpeedMultiplier;
     private readonly float _attackSpeedMultiplier;
 
     private float _currentGauge;
     private float _remainingDuration;
+    private int _currentUseCount;
     private bool _isAssembled;
 
     public string Id => _id;
@@ -31,7 +33,8 @@ public class BAAssembleModel
     public bool CanAssemble =>
         !_isAssembled &&
         _maxGauge > 0f &&
-        _currentGauge >= _maxGauge;
+        _currentGauge >= _maxGauge &&
+        _currentUseCount < _maxUseCount;
 
     public event Action<float, float> GaugeChanged;
     public event Action<float, float> DurationChanged;
@@ -50,6 +53,7 @@ public class BAAssembleModel
         _maxGauge = Math.Max(0f, assembleData.MaxGauge);
         _gaugeGainPerHit = Math.Max(0f, assembleData.GaugeGainPerHit);
         _duration = Math.Max(0f, assembleData.Duration);
+        _maxUseCount = Math.Max(0, assembleData.MaxUseCount);
         _attackDamageMultiplier = Math.Max(0f, assembleData.AttackDamageMultiplier);
         _moveSpeedMultiplier = Math.Max(0f, assembleData.MoveSpeedMultiplier);
         _attackSpeedMultiplier = Math.Max(0f, assembleData.AttackSpeedMultiplier);
@@ -57,7 +61,7 @@ public class BAAssembleModel
 
     public void AddGaugeByHit()
     {
-        if (_isAssembled)
+        if (_isAssembled || _currentUseCount >= _maxUseCount)
         {
             return;
         }
@@ -87,6 +91,7 @@ public class BAAssembleModel
         GaugeChanged?.Invoke(_currentGauge, _maxGauge);
         DurationChanged?.Invoke(_remainingDuration, _duration);
         AssembleStateChanged?.Invoke(_isAssembled);
+        _currentUseCount++;
         return true;
     }
 
@@ -110,6 +115,7 @@ public class BAAssembleModel
     {
         _currentGauge = 0f;
         _remainingDuration = 0f;
+        _currentUseCount = 0;
         _isAssembled = false;
 
         GaugeChanged?.Invoke(_currentGauge, _maxGauge);

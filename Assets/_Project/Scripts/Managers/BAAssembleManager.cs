@@ -96,9 +96,10 @@ public class BAAssembleManager : MonoBehaviour
 
         if (assembleData.MaxGauge <= 0f ||
             assembleData.GaugeGainPerHit <= 0f ||
-            assembleData.Duration <= 0f)
+            assembleData.Duration <= 0f ||
+            assembleData.MaxUseCount <= 0)
         {
-            Debug.LogError($"합체 게이지 또는 지속시간 데이터가 유효하지 않습니다: {_assembleId}");
+            Debug.LogError($"합체 게이지, 지속시간 또는 최대 사용 횟수 데이터가 유효하지 않습니다: {_assembleId}");
             return false;
         }
 
