@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "Support_001",
+    "DisplayName": "라이노 캐리어",
+    "PrefabKey": "Unit/Support/RhinoCarrier",
+    "EffectType": "Damage",
+    "BaseEffectValue": 25,
+    "Cooldown": 12,
+    "MoveSpeed": 8,
+    "NormalMaxTargetCount": 5,
+    "AssembledEffectMultiplier": 1.5,
+    "AssembledRange": 5,
+    "AssembledMaxTargetCount": 5,
+    "EffectDuration": 0
+  }
+]
