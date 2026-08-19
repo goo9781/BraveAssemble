@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: d89e344dcf6d0b944996fb50ee3795b1
   m_SerializeEntries:
+  - m_GUID: 2289095a15fb728418e4f1b4c78a31f5
+    m_Address: Unit/Support/RhinoCarrier
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e100090c77100e946b409779626cfa34
     m_Address: Unit/Enemy/MeleeRobot
     m_ReadOnly: 0

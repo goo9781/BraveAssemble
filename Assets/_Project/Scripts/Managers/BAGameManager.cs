@@ -23,6 +23,7 @@ public class BAGameManager : MonoBehaviour
     [SerializeField] private BAStageManager _stageManager;
     [SerializeField] private BASkillManager _skillManager;
     [SerializeField] private BAAssembleManager _assembleManager;
+    [SerializeField] private BASupportManager _supportManager;
     [SerializeField] private BAUIManager _uiManager;
 
     private bool _isInitialized;
@@ -214,6 +215,26 @@ public class BAGameManager : MonoBehaviour
                 _stageManager))
         {
             Debug.LogError("합체 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (_supportManager == null)
+        {
+            Debug.LogError("BASupportManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        yield return _supportManager.InitializeAsync(
+            _dataManager,
+            _assetManager,
+            _poolManager,
+            _battleManager,
+            _stageManager,
+            _assembleManager);
+
+        if (!_supportManager.IsInitialized)
+        {
+            Debug.LogError("서포트 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
             yield break;
         }
 
