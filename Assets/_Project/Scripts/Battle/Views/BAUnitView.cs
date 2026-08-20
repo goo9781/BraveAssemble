@@ -17,6 +17,7 @@ public class BAUnitView : MonoBehaviour
     public float CurrentHealth => _viewModel?.CurrentHealth ?? 0f;
     public bool IsDead => _viewModel == null || _viewModel.IsDead;
 
+    public event Action<float, float> HealthChanged;
     public event Action Died;
 
     public void Bind(BAUnitViewModel viewModel)
@@ -29,7 +30,9 @@ public class BAUnitView : MonoBehaviour
         Unbind();
 
         _viewModel = viewModel;
+        _viewModel.HealthChanged += OnHealthChanged;
         _viewModel.Died += OnDied;
+        HealthChanged?.Invoke(_viewModel.CurrentHealth, _viewModel.MaxHealth);
     }
 
     public void Unbind()
@@ -39,6 +42,7 @@ public class BAUnitView : MonoBehaviour
             return;
         }
 
+        _viewModel.HealthChanged -= OnHealthChanged;
         _viewModel.Died -= OnDied;
         _viewModel = null;
     }
@@ -99,5 +103,10 @@ public class BAUnitView : MonoBehaviour
     {
         Died?.Invoke();
         gameObject.SetActive(false);
+    }
+
+    private void OnHealthChanged(float currentHealth, float maxHealth)
+    {
+        HealthChanged?.Invoke(currentHealth, maxHealth);
     }
 }
