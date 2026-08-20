@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 589966051724466084}
   - component: {fileID: 4271449358671490297}
   - component: {fileID: 269504726760100725}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MeleeRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
