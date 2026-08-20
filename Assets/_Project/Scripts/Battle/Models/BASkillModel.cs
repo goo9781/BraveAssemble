@@ -8,6 +8,9 @@ public class BASkillModel
     private readonly float _damageMultiplier;
     private readonly float _range;
     private readonly int _maxTargetCount;
+    private readonly float _assembledDamageMultiplier;
+    private readonly float _assembledRange;
+    private readonly int _assembledMaxTargetCount;
     private readonly float _cooldown;
 
     private float _remainingCooldown;
@@ -18,6 +21,9 @@ public class BASkillModel
     public float DamageMultiplier => _damageMultiplier;
     public float Range => _range;
     public int MaxTargetCount => _maxTargetCount;
+    public float AssembledDamageMultiplier => _assembledDamageMultiplier;
+    public float AssembledRange => _assembledRange;
+    public int AssembledMaxTargetCount => _assembledMaxTargetCount;
     public float Cooldown => _cooldown;
     public float RemainingCooldown => _remainingCooldown;
     public bool CanUse => _remainingCooldown <= 0f;
@@ -37,6 +43,9 @@ public class BASkillModel
         _damageMultiplier = Math.Max(0f, skillData.DamageMultiplier);
         _range = Math.Max(0f, skillData.Range);
         _maxTargetCount = Math.Max(0, skillData.MaxTargetCount);
+        _assembledDamageMultiplier = Math.Max(0f, skillData.AssembledDamageMultiplier);
+        _assembledRange = Math.Max(0f, skillData.AssembledRange);
+        _assembledMaxTargetCount = Math.Max(0, skillData.AssembledMaxTargetCount);
         _cooldown = Math.Max(0f, skillData.Cooldown);
     }
 

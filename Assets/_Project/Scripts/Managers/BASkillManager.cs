@@ -11,6 +11,7 @@ public class BASkillManager : MonoBehaviour
 
     private BABattleManager _battleManager;
     private BAStageManager _stageManager;
+    private BAAssembleManager _assembleManager;
     private BASkillModel _skillModel;
     private bool _isInitialized;
 
@@ -43,7 +44,8 @@ public class BASkillManager : MonoBehaviour
     public bool Initialize(
         BADataManager dataManager,
         BABattleManager battleManager,
-        BAStageManager stageManager)
+        BAStageManager stageManager,
+        BAAssembleManager assembleManager)
     {
         if (_isInitialized)
         {
@@ -68,6 +70,12 @@ public class BASkillManager : MonoBehaviour
             return false;
         }
 
+        if (assembleManager == null || !assembleManager.IsInitialized)
+        {
+            Debug.LogError("BAAssembleManager가 없거나 초기화되지 않아 스킬 매니저를 초기화할 수 없습니다.");
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(_skillId))
         {
             Debug.LogError("스킬 ID가 설정되지 않아 스킬 매니저를 초기화할 수 없습니다.");
@@ -89,6 +97,9 @@ public class BASkillManager : MonoBehaviour
         if (skillData.DamageMultiplier <= 0f ||
             skillData.Range <= 0f ||
             skillData.MaxTargetCount <= 0 ||
+            skillData.AssembledDamageMultiplier <= 0f ||
+            skillData.AssembledRange <= 0f ||
+            skillData.AssembledMaxTargetCount <= 0 ||
             skillData.Cooldown < 0f)
         {
             Debug.LogError($"스킬 데이터의 수치가 유효하지 않습니다: {_skillId}");
@@ -97,6 +108,7 @@ public class BASkillManager : MonoBehaviour
 
         _battleManager = battleManager;
         _stageManager = stageManager;
+        _assembleManager = assembleManager;
         _skillModel = new BASkillModel(skillData);
         _skillModel.CooldownChanged += OnCooldownChanged;
         _isInitialized = true;
@@ -128,12 +140,21 @@ public class BASkillManager : MonoBehaviour
             return false;
         }
 
-        float damage = heroView.AttackDamage * _skillModel.DamageMultiplier;
+        float damageMultiplier = _assembleManager.IsAssembled
+            ? _skillModel.AssembledDamageMultiplier
+            : _skillModel.DamageMultiplier;
+        float range = _assembleManager.IsAssembled
+            ? _skillModel.AssembledRange
+            : _skillModel.Range;
+        int maxTargetCount = _assembleManager.IsAssembled
+            ? _skillModel.AssembledMaxTargetCount
+            : _skillModel.MaxTargetCount;
+        float damage = heroView.AttackDamage * damageMultiplier;
 
         if (!_battleManager.TryApplyAreaDamage(
                 heroView,
-                _skillModel.Range,
-                _skillModel.MaxTargetCount,
+                range,
+                maxTargetCount,
                 damage,
                 out int hitCount))
         {

@@ -191,18 +191,6 @@ public class BAGameManager : MonoBehaviour
         _stageManager.StageCleared += OnStageCleared;
         _stageManager.StageFailed += OnStageFailed;
 
-        if (_skillManager == null)
-        {
-            Debug.LogError("BASkillManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
-            yield break;
-        }
-
-        if (!_skillManager.Initialize(_dataManager, _battleManager, _stageManager))
-        {
-            Debug.LogError("스킬 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
-            yield break;
-        }
-
         if (_assembleManager == null)
         {
             Debug.LogError("BAAssembleManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
@@ -215,6 +203,22 @@ public class BAGameManager : MonoBehaviour
                 _stageManager))
         {
             Debug.LogError("합체 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (_skillManager == null)
+        {
+            Debug.LogError("BASkillManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
+            yield break;
+        }
+
+        if (!_skillManager.Initialize(
+                _dataManager,
+                _battleManager,
+                _stageManager,
+                _assembleManager))
+        {
+            Debug.LogError("스킬 매니저 초기화에 실패하여 게임 초기화를 중단합니다.");
             yield break;
         }
 
