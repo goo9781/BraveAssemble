@@ -6,5 +6,8 @@ public class BASkillData : BAGameDataBase
     public float DamageMultiplier;
     public float Range;
     public int MaxTargetCount;
+    public float AssembledDamageMultiplier;
+    public float AssembledRange;
+    public int AssembledMaxTargetCount;
     public float Cooldown;
 }

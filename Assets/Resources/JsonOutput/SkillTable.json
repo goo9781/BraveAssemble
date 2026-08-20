@@ -6,6 +6,9 @@
     "DamageMultiplier": 3,
     "Range": 5,
     "MaxTargetCount": 5,
+    "AssembledDamageMultiplier": 4,
+    "AssembledRange": 7,
+    "AssembledMaxTargetCount": 8,
     "Cooldown": 8
   }
 ]
