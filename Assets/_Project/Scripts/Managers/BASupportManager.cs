@@ -229,17 +229,22 @@ public class BASupportManager : MonoBehaviour
             return false;
         }
 
-        if (_assembleManager.IsAssembled)
-        {
-            return false;
-        }
-
         if (_supportModel.EffectType != _damageEffectType)
         {
             Debug.LogError($"지원하지 않는 서포트 효과 유형입니다: {_supportModel.EffectType}");
             return false;
         }
 
+        if (_assembleManager.IsAssembled)
+        {
+            return TryUseAssembledSupport();
+        }
+
+        return TryUseNormalSupport();
+    }
+
+    private bool TryUseNormalSupport()
+    {
         GameObject supportInstance = _poolManager.Spawn(
             _supportModel.PrefabKey,
             _entryPoint.position,
@@ -274,6 +279,34 @@ public class BASupportManager : MonoBehaviour
         }
 
         SupportActiveStateChanged?.Invoke(true);
+        return true;
+    }
+
+    private bool TryUseAssembledSupport()
+    {
+        if (!_battleManager.TryGetFirstActiveUnitByType(
+                _heroUnitType,
+                out BAUnitView heroView))
+        {
+            return false;
+        }
+
+        float damage =
+            heroView.AttackDamage +
+            (_supportModel.BaseEffectValue * _supportModel.AssembledEffectMultiplier);
+
+        if (!_supportModel.TryStartCooldown())
+        {
+            return false;
+        }
+
+        _battleManager.TryApplyAreaDamage(
+            heroView,
+            _supportModel.AssembledRange,
+            _supportModel.AssembledMaxTargetCount,
+            damage,
+            out _);
+
         return true;
     }
 

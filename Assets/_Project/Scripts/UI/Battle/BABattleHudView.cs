@@ -452,7 +452,6 @@ public class BABattleHudView : MonoBehaviour
             !_viewModel.IsPaused &&
             !_viewModel.IsStageCleared &&
             !_viewModel.IsStageFailed &&
-            !_viewModel.IsAssembled &&
             _viewModel.CanUseSupport;
     }
 
