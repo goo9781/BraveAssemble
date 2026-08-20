@@ -227,6 +227,58 @@ public class BABattleManager : MonoBehaviour
         return hitCount > 0;
     }
 
+    public bool TryApplySupportDamage(
+        string allyUnitType,
+        Vector2 origin,
+        float damage,
+        int maxTargetCount,
+        out int hitCount)
+    {
+        hitCount = 0;
+
+        if (!_isInitialized ||
+            string.IsNullOrWhiteSpace(allyUnitType) ||
+            damage <= 0f ||
+            maxTargetCount <= 0)
+        {
+            return false;
+        }
+
+        List<BAUnitView> targets = new List<BAUnitView>();
+
+        foreach (BAUnitView candidate in _boundUnits.Keys)
+        {
+            if (candidate == null ||
+                !candidate.gameObject.activeInHierarchy ||
+                candidate.IsDead ||
+                candidate.UnitType == allyUnitType)
+            {
+                continue;
+            }
+
+            targets.Add(candidate);
+        }
+
+        targets.Sort((left, right) =>
+        {
+            float leftDistanceSquared =
+                ((Vector2)left.transform.position - origin).sqrMagnitude;
+            float rightDistanceSquared =
+                ((Vector2)right.transform.position - origin).sqrMagnitude;
+            return leftDistanceSquared.CompareTo(rightDistanceSquared);
+        });
+
+        int targetCount = Mathf.Min(maxTargetCount, targets.Count);
+
+        for (int index = 0; index < targetCount; index++)
+        {
+            targets[index].TakeDamage(damage);
+            hitCount++;
+        }
+
+        return hitCount > 0;
+    }
+
     public bool TryFindNearestEnemy(BAUnitView requester, out BAUnitView target)
     {
         target = null;

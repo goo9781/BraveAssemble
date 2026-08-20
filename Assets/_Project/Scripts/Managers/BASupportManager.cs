@@ -5,6 +5,9 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BASupportManager : MonoBehaviour
 {
+    private const string _heroUnitType = "Hero";
+    private const string _damageEffectType = "Damage";
+
     [SerializeField] private string _supportId;
     [SerializeField] private Transform _entryPoint;
     [SerializeField] private Transform _actionPoint;
@@ -17,6 +20,7 @@ public class BASupportManager : MonoBehaviour
     private BAStageManager _stageManager;
     private BAAssembleManager _assembleManager;
     private BASupportModel _supportModel;
+    private GameObject _activeSupportInstance;
     private bool _isInitialized;
     private bool _isInitializing;
 
@@ -35,10 +39,12 @@ public class BASupportManager : MonoBehaviour
     public float AssembledRange => _supportModel?.AssembledRange ?? 0f;
     public int AssembledMaxTargetCount => _supportModel?.AssembledMaxTargetCount ?? 0;
     public float EffectDuration => _supportModel?.EffectDuration ?? 0f;
+    public bool IsSupportActive => _activeSupportInstance != null;
     public bool CanUse =>
         _isInitialized &&
         _supportModel != null &&
         _supportModel.CanUse &&
+        !IsSupportActive &&
         !_stageManager.IsStageEnded;
     public Transform EntryPoint => _entryPoint;
     public Transform ActionPoint => _actionPoint;
@@ -200,6 +206,8 @@ public class BASupportManager : MonoBehaviour
 
         _isInitialized = true;
         _isInitializing = false;
+        _stageManager.StageCleared += OnStageEnded;
+        _stageManager.StageFailed += OnStageEnded;
         CooldownChanged?.Invoke(_supportModel.RemainingCooldown, _supportModel.Cooldown);
     }
 
@@ -211,6 +219,100 @@ public class BASupportManager : MonoBehaviour
         }
 
         _supportModel.UpdateCooldown(Time.deltaTime);
+    }
+
+    public bool TryUseSupport()
+    {
+        if (!CanUse)
+        {
+            return false;
+        }
+
+        if (_assembleManager.IsAssembled)
+        {
+            return false;
+        }
+
+        if (_supportModel.EffectType != _damageEffectType)
+        {
+            Debug.LogError($"지원하지 않는 서포트 효과 유형입니다: {_supportModel.EffectType}");
+            return false;
+        }
+
+        GameObject supportInstance = _poolManager.Spawn(
+            _supportModel.PrefabKey,
+            _entryPoint.position,
+            _entryPoint.rotation);
+
+        if (supportInstance == null)
+        {
+            return false;
+        }
+
+        BASupportMovementController movementController =
+            supportInstance.GetComponent<BASupportMovementController>();
+
+        if (movementController == null)
+        {
+            Debug.LogError($"서포트 프리팹에 BASupportMovementController가 없습니다: {_supportModel.PrefabKey}");
+            _poolManager.Release(supportInstance);
+            return false;
+        }
+
+        _activeSupportInstance = supportInstance;
+
+        if (!movementController.TryStartMovement(
+                _actionPoint.position,
+                _exitPoint.position,
+                _supportModel.MoveSpeed,
+                OnSupportActionReached,
+                OnSupportMovementCompleted))
+        {
+            ReleaseActiveSupport();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void OnSupportActionReached()
+    {
+        if (!_isInitialized || _stageManager.IsStageEnded)
+        {
+            return;
+        }
+
+        if (_supportModel.EffectType == _damageEffectType &&
+            _battleManager.TryApplySupportDamage(
+                _heroUnitType,
+                _actionPoint.position,
+                _supportModel.BaseEffectValue,
+                _supportModel.NormalMaxTargetCount,
+                out int hitCount))
+        {
+            _supportModel.TryStartCooldown();
+        }
+    }
+
+    private void OnSupportMovementCompleted()
+    {
+        ReleaseActiveSupport();
+    }
+
+    private void OnStageEnded()
+    {
+        ReleaseActiveSupport();
+    }
+
+    private void ReleaseActiveSupport()
+    {
+        GameObject supportInstance = _activeSupportInstance;
+        _activeSupportInstance = null;
+
+        if (supportInstance != null && _poolManager != null)
+        {
+            _poolManager.Release(supportInstance);
+        }
     }
 
     private void OnCooldownChanged(float remainingCooldown, float cooldown)
@@ -231,6 +333,13 @@ public class BASupportManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_stageManager != null)
+        {
+            _stageManager.StageCleared -= OnStageEnded;
+            _stageManager.StageFailed -= OnStageEnded;
+        }
+
+        ReleaseActiveSupport();
         ClearSupportModel();
 
         if (Instance == this)
