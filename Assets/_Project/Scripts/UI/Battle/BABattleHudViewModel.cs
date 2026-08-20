@@ -8,6 +8,7 @@ public class BABattleHudViewModel : IDisposable
     private readonly BAStageManager _stageManager;
     private readonly BASkillManager _skillManager;
     private readonly BAAssembleManager _assembleManager;
+    private readonly BASupportManager _supportManager;
 
     private BAUnitViewModel _heroViewModel;
     private bool _isDisposed;
@@ -29,6 +30,11 @@ public class BABattleHudViewModel : IDisposable
     public float AssembleRemainingDuration => _assembleManager.RemainingDuration;
     public bool IsAssembled => _assembleManager.IsAssembled;
     public bool CanAssemble => _assembleManager.CanAssemble;
+    public string SupportDisplayName => _supportManager.DisplayName;
+    public float SupportCooldown => _supportManager.Cooldown;
+    public float SupportRemainingCooldown => _supportManager.RemainingCooldown;
+    public bool CanUseSupport => _supportManager.CanUse;
+    public bool IsSupportActive => _supportManager.IsSupportActive;
     public bool IsPaused => _isPaused;
 
     public event Action<float, float> HeroHealthChanged;
@@ -44,17 +50,21 @@ public class BABattleHudViewModel : IDisposable
     public event Action<float, float> AssembleGaugeChanged;
     public event Action<float, float> AssembleDurationChanged;
     public event Action<bool> AssembleStateChanged;
+    public event Action<float, float> SupportCooldownChanged;
+    public event Action<bool> SupportActiveStateChanged;
 
     public BABattleHudViewModel(
         BABattleManager battleManager,
         BAStageManager stageManager,
         BASkillManager skillManager,
-        BAAssembleManager assembleManager)
+        BAAssembleManager assembleManager,
+        BASupportManager supportManager)
     {
         _battleManager = battleManager ?? throw new ArgumentNullException(nameof(battleManager));
         _stageManager = stageManager ?? throw new ArgumentNullException(nameof(stageManager));
         _skillManager = skillManager ?? throw new ArgumentNullException(nameof(skillManager));
         _assembleManager = assembleManager ?? throw new ArgumentNullException(nameof(assembleManager));
+        _supportManager = supportManager ?? throw new ArgumentNullException(nameof(supportManager));
 
         if (!_skillManager.IsInitialized)
         {
@@ -66,6 +76,11 @@ public class BABattleHudViewModel : IDisposable
             throw new ArgumentException("합체 매니저가 초기화되지 않았습니다.", nameof(assembleManager));
         }
 
+        if (!_supportManager.IsInitialized)
+        {
+            throw new ArgumentException("서포트 매니저가 초기화되지 않았습니다.", nameof(supportManager));
+        }
+
         _battleManager.UnitBound += OnUnitBound;
         _stageManager.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         _stageManager.StageCleared += OnStageCleared;
@@ -74,6 +89,8 @@ public class BABattleHudViewModel : IDisposable
         _assembleManager.GaugeChanged += OnAssembleGaugeChanged;
         _assembleManager.DurationChanged += OnAssembleDurationChanged;
         _assembleManager.AssembleStateChanged += OnAssembleStateChanged;
+        _supportManager.CooldownChanged += OnSupportCooldownChanged;
+        _supportManager.SupportActiveStateChanged += OnSupportActiveStateChanged;
 
         if (_battleManager.TryGetFirstUnitViewModelByType(
                 _heroUnitType,
@@ -121,6 +138,16 @@ public class BABattleHudViewModel : IDisposable
         }
 
         _assembleManager.TryStartAssemble();
+    }
+
+    public void RequestUseSupport()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _supportManager.TryUseSupport();
     }
 
     public void RequestPause()
@@ -171,6 +198,8 @@ public class BABattleHudViewModel : IDisposable
         _assembleManager.GaugeChanged -= OnAssembleGaugeChanged;
         _assembleManager.DurationChanged -= OnAssembleDurationChanged;
         _assembleManager.AssembleStateChanged -= OnAssembleStateChanged;
+        _supportManager.CooldownChanged -= OnSupportCooldownChanged;
+        _supportManager.SupportActiveStateChanged -= OnSupportActiveStateChanged;
 
         if (_heroViewModel != null)
         {
@@ -245,5 +274,15 @@ public class BABattleHudViewModel : IDisposable
     private void OnAssembleStateChanged(bool isAssembled)
     {
         AssembleStateChanged?.Invoke(isAssembled);
+    }
+
+    private void OnSupportCooldownChanged(float remainingCooldown, float cooldown)
+    {
+        SupportCooldownChanged?.Invoke(remainingCooldown, cooldown);
+    }
+
+    private void OnSupportActiveStateChanged(bool isSupportActive)
+    {
+        SupportActiveStateChanged?.Invoke(isSupportActive);
     }
 }

@@ -51,6 +51,7 @@ public class BASupportManager : MonoBehaviour
     public Transform ExitPoint => _exitPoint;
 
     public event Action<float, float> CooldownChanged;
+    public event Action<bool> SupportActiveStateChanged;
 
     private void Awake()
     {
@@ -272,6 +273,7 @@ public class BASupportManager : MonoBehaviour
             return false;
         }
 
+        SupportActiveStateChanged?.Invoke(true);
         return true;
     }
 
@@ -282,20 +284,24 @@ public class BASupportManager : MonoBehaviour
             return;
         }
 
-        if (_supportModel.EffectType == _damageEffectType &&
+        if (_supportModel.EffectType == _damageEffectType)
+        {
             _battleManager.TryApplySupportDamage(
                 _heroUnitType,
                 _actionPoint.position,
                 _supportModel.BaseEffectValue,
                 _supportModel.NormalMaxTargetCount,
-                out int hitCount))
-        {
-            _supportModel.TryStartCooldown();
+                out _);
         }
     }
 
     private void OnSupportMovementCompleted()
     {
+        if (_supportModel != null)
+        {
+            _supportModel.TryStartCooldown();
+        }
+
         ReleaseActiveSupport();
     }
 
@@ -309,10 +315,17 @@ public class BASupportManager : MonoBehaviour
         GameObject supportInstance = _activeSupportInstance;
         _activeSupportInstance = null;
 
-        if (supportInstance != null && _poolManager != null)
+        if (supportInstance == null)
+        {
+            return;
+        }
+
+        if (_poolManager != null)
         {
             _poolManager.Release(supportInstance);
         }
+
+        SupportActiveStateChanged?.Invoke(false);
     }
 
     private void OnCooldownChanged(float remainingCooldown, float cooldown)

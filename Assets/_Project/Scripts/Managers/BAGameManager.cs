@@ -256,7 +256,8 @@ public class BAGameManager : MonoBehaviour
                 _battleManager,
                 _stageManager,
                 _skillManager,
-                _assembleManager))
+                _assembleManager,
+                _supportManager))
         {
             Debug.LogError("전투 HUD 바인딩에 실패하여 게임 초기화를 중단합니다.");
             yield break;
