@@ -12,6 +12,7 @@ public class BAAssembleManager : MonoBehaviour
     private BAStageManager _stageManager;
     private BAAssembleModel _assembleModel;
     private BAUnitView _assembledHero;
+    private BAHeroVisualController _assembledHeroVisualController;
     private bool _isInitialized;
 
     public static BAAssembleManager Instance { get; private set; }
@@ -150,6 +151,13 @@ public class BAAssembleManager : MonoBehaviour
             return false;
         }
 
+        if (!heroView.TryGetComponent(out BAHeroVisualController visualController) ||
+            !visualController.IsInitialized)
+        {
+            Debug.LogError("용자 로봇의 합체 Visual Controller를 찾지 못했거나 초기화되지 않았습니다.");
+            return false;
+        }
+
         if (!heroView.ApplyCombatModifiers(
                 _assembleModel.AttackDamageMultiplier,
                 _assembleModel.MoveSpeedMultiplier,
@@ -158,12 +166,18 @@ public class BAAssembleManager : MonoBehaviour
             return false;
         }
 
+        if (!visualController.TrySetAssembled(true))
+        {
+            heroView.ResetCombatModifiers();
+            return false;
+        }
+
         _assembledHero = heroView;
+        _assembledHeroVisualController = visualController;
 
         if (!_assembleModel.TryStartAssemble())
         {
-            heroView.ResetCombatModifiers();
-            _assembledHero = null;
+            ResetAssembledHero();
             return false;
         }
 
@@ -205,22 +219,34 @@ public class BAAssembleManager : MonoBehaviour
 
     private void OnAssembleStateChanged(bool isAssembled)
     {
-        if (!isAssembled && _assembledHero != null)
+        if (!isAssembled)
         {
-            _assembledHero.ResetCombatModifiers();
-            _assembledHero = null;
+            ResetAssembledHero();
         }
 
         AssembleStateChanged?.Invoke(isAssembled);
     }
 
-    private void OnDestroy()
+    private void ResetAssembledHero()
     {
+        if (_assembledHeroVisualController != null)
+        {
+            _assembledHeroVisualController.TrySetAssembled(false);
+        }
+
+        _assembledHeroVisualController = null;
+
         if (_assembledHero != null)
         {
             _assembledHero.ResetCombatModifiers();
-            _assembledHero = null;
         }
+
+        _assembledHero = null;
+    }
+
+    private void OnDestroy()
+    {
+        ResetAssembledHero();
 
         if (_battleManager != null)
         {
