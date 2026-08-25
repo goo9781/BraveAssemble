@@ -111,7 +111,7 @@ Transform:
   m_GameObject: {fileID: 2877297203405252994}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.8, z: 0}
+  m_LocalPosition: {x: 0, y: -1.1, z: 0}
   m_LocalScale: {x: 0.28, y: 0.28, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -350,6 +350,7 @@ GameObject:
   - component: {fileID: 589966051724466084}
   - component: {fileID: 4271449358671490297}
   - component: {fileID: 269504726760100725}
+  - component: {fileID: 426687436470616291}
   m_Layer: 6
   m_Name: MeleeRobot
   m_TagString: Untagged
@@ -544,3 +545,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAUnitHealthView
   _healthText: {fileID: 2730597852690334251}
+--- !u!114 &426687436470616291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7366111791891649381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd5450b62314b148924b261d170a2a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAEnemyVisualController
+  _animator: {fileID: 4704818235720615796}
+  _movementThreshold: 0.001
+  _movementStopDelay: 0.08
