@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     private bool _isInitialized;
     private float _nextTargetSearchTime;
     private float _nextAttackTime;
+
+    public event Action AttackPerformed;
 
     private void Awake()
     {
@@ -129,6 +132,7 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
         }
 
         _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
+        AttackPerformed?.Invoke();
     }
 
     public void OnSpawned()
