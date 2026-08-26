@@ -2,15 +2,18 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BAUnitView))]
+[RequireComponent(typeof(BAUnitCombatController))]
 public class BAHeroVisualController : MonoBehaviour
 {
     private static readonly int _isMovingParameterHash = Animator.StringToHash("IsMoving");
+    private static readonly int _attackParameterHash = Animator.StringToHash("Attack");
 
     [SerializeField] private GameObject _normalVisual;
     [SerializeField] private GameObject _assembledVisual;
     [SerializeField] private float _movementThreshold = 0.001f;
     [SerializeField] private float _movementStopDelay = 0.08f;
 
+    private BAUnitCombatController _combatController;
     private Animator _animator;
     private Vector3 _previousPosition;
     private float _lastMovementTime;
@@ -23,6 +26,9 @@ public class BAHeroVisualController : MonoBehaviour
 
     private void Awake()
     {
+        _combatController = GetComponent<BAUnitCombatController>();
+        _combatController.AttackPerformed += OnAttackPerformed;
+
         if (_normalVisual == null || _assembledVisual == null)
         {
             Debug.LogError("용자 로봇의 일반 및 합체 Visual 참조가 설정되지 않았습니다.");
@@ -87,10 +93,36 @@ public class BAHeroVisualController : MonoBehaviour
             return false;
         }
 
+        if (isAssembled)
+        {
+            _animator.ResetTrigger(_attackParameterHash);
+        }
+
         _normalVisual.SetActive(!isAssembled);
         _assembledVisual.SetActive(isAssembled);
         _isAssembled = isAssembled;
         return true;
+    }
+
+    private void OnDestroy()
+    {
+        if (_combatController != null)
+        {
+            _combatController.AttackPerformed -= OnAttackPerformed;
+        }
+    }
+
+    private void OnAttackPerformed()
+    {
+        if (!_isInitialized ||
+            _isAssembled ||
+            !_normalVisual.activeInHierarchy ||
+            !_animator.isActiveAndEnabled)
+        {
+            return;
+        }
+
+        _animator.SetTrigger(_attackParameterHash);
     }
 
     private void SetMoving(bool isMoving)

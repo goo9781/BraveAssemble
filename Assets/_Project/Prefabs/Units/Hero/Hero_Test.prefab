@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAUnitCombatController
   _unitId: Hero_001
+  _usesAttackAnimationEvent: 0
 --- !u!114 &4586640577023390548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,3 +416,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BAHeroVisualController
   _normalVisual: {fileID: 3166584580740659760}
   _assembledVisual: {fileID: 4861754602539207520}
+  _movementThreshold: 0.001
+  _movementStopDelay: 0.08
