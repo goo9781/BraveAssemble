@@ -14,7 +14,8 @@ public class BAHeroVisualController : MonoBehaviour
     [SerializeField] private float _movementStopDelay = 0.08f;
 
     private BAUnitCombatController _combatController;
-    private Animator _animator;
+    private Animator _normalAnimator;
+    private Animator _assembledAnimator;
     private Vector3 _previousPosition;
     private float _lastMovementTime;
     private bool _isInitialized;
@@ -41,15 +42,23 @@ public class BAHeroVisualController : MonoBehaviour
             return;
         }
 
-        _animator = _normalVisual.GetComponent<Animator>();
+        _normalAnimator = _normalVisual.GetComponent<Animator>();
+        _assembledAnimator = _assembledVisual.GetComponent<Animator>();
 
-        if (_animator == null)
+        if (_normalAnimator == null || _assembledAnimator == null)
         {
-            Debug.LogError("용자 로봇의 일반 Visual에서 Animator를 찾을 수 없습니다.");
+            Debug.LogError("용자 로봇의 일반 또는 합체 Visual에서 Animator를 찾을 수 없습니다.");
             return;
         }
 
-        _isMoving = _animator.GetBool(_isMovingParameterHash);
+        if (_normalAnimator.runtimeAnimatorController == null ||
+            _assembledAnimator.runtimeAnimatorController == null)
+        {
+            Debug.LogError("용자 로봇의 일반 또는 합체 Animator Controller가 설정되지 않았습니다.");
+            return;
+        }
+
+        _isMoving = _normalAnimator.GetBool(_isMovingParameterHash);
         SetMoving(false);
         _previousPosition = transform.position;
         _lastMovementTime = Time.time;
@@ -95,12 +104,22 @@ public class BAHeroVisualController : MonoBehaviour
 
         if (isAssembled)
         {
-            _animator.ResetTrigger(_attackParameterHash);
+            _normalAnimator.ResetTrigger(_attackParameterHash);
         }
 
         _normalVisual.SetActive(!isAssembled);
         _assembledVisual.SetActive(isAssembled);
         _isAssembled = isAssembled;
+
+        Animator activeAnimator = isAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (activeAnimator.gameObject.activeInHierarchy &&
+            activeAnimator.isActiveAndEnabled &&
+            activeAnimator.runtimeAnimatorController != null)
+        {
+            activeAnimator.SetBool(_isMovingParameterHash, _isMoving);
+        }
+
         return true;
     }
 
@@ -117,12 +136,12 @@ public class BAHeroVisualController : MonoBehaviour
         if (!_isInitialized ||
             _isAssembled ||
             !_normalVisual.activeInHierarchy ||
-            !_animator.isActiveAndEnabled)
+            !_normalAnimator.isActiveAndEnabled)
         {
             return;
         }
 
-        _animator.SetTrigger(_attackParameterHash);
+        _normalAnimator.SetTrigger(_attackParameterHash);
     }
 
     private void SetMoving(bool isMoving)
@@ -133,6 +152,13 @@ public class BAHeroVisualController : MonoBehaviour
         }
 
         _isMoving = isMoving;
-        _animator.SetBool(_isMovingParameterHash, _isMoving);
+        Animator activeAnimator = _isAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (activeAnimator.gameObject.activeInHierarchy &&
+            activeAnimator.isActiveAndEnabled &&
+            activeAnimator.runtimeAnimatorController != null)
+        {
+            activeAnimator.SetBool(_isMovingParameterHash, _isMoving);
+        }
     }
 }
