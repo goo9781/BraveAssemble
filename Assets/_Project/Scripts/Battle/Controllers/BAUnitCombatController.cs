@@ -11,10 +11,12 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     private const float _targetSearchInterval = 0.2f;
 
     [SerializeField] private string _unitId;
+    [SerializeField] private bool _usesAttackAnimationEvent;
 
     private BAUnitView _unitView;
     private Rigidbody2D _rigidbody;
     private BAUnitView _target;
+    private BAUnitView _pendingAttackTarget;
     private bool _isInitialized;
     private float _nextTargetSearchTime;
     private float _nextAttackTime;
@@ -84,6 +86,12 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
             }
         }
 
+        if (_pendingAttackTarget != null)
+        {
+            StopHorizontalMovement();
+            return;
+        }
+
         if (_target == null && Time.time >= _nextTargetSearchTime)
         {
             _nextTargetSearchTime = Time.time + _targetSearchInterval;
@@ -123,6 +131,14 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
             return;
         }
 
+        if (_usesAttackAnimationEvent)
+        {
+            _pendingAttackTarget = _target;
+            _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
+            AttackPerformed?.Invoke();
+            return;
+        }
+
         if (!BABattleManager.Instance.TryApplyDamage(
                 _unitView,
                 _target,
@@ -133,6 +149,34 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
 
         _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
         AttackPerformed?.Invoke();
+    }
+
+    public void ApplyPendingAttackDamage()
+    {
+        BAUnitView pendingTarget = _pendingAttackTarget;
+        _pendingAttackTarget = null;
+
+        if (!_isInitialized || _unitView == null || _unitView.IsDead)
+        {
+            return;
+        }
+
+        if (pendingTarget == null ||
+            !pendingTarget.gameObject.activeInHierarchy ||
+            pendingTarget.IsDead)
+        {
+            return;
+        }
+
+        if (BABattleManager.Instance == null)
+        {
+            return;
+        }
+
+        BABattleManager.Instance.TryApplyDamage(
+            _unitView,
+            pendingTarget,
+            _unitView.AttackDamage);
     }
 
     public void OnSpawned()
@@ -168,6 +212,7 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     private void ResetCombatState()
     {
         _target = null;
+        _pendingAttackTarget = null;
         _nextTargetSearchTime = 0f;
         _nextAttackTime = 0f;
 

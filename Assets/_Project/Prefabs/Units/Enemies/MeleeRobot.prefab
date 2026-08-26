@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 8650064219657988686}
   - component: {fileID: 4193364452388971557}
   - component: {fileID: 4704818235720615796}
+  - component: {fileID: 2195483631109844924}
   m_Layer: 6
   m_Name: Visual
   m_TagString: Untagged
@@ -198,6 +199,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2195483631109844924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2877297203405252994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970cdfd2cfeac1a429eea37a0e6b26e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAUnitAnimationEventRelay
+  _unitCombatController: {fileID: 4271449358671490297}
 --- !u!1 &4865210955548142748
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,6 +546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAUnitCombatController
   _unitId: Enemy_001
+  _usesAttackAnimationEvent: 1
 --- !u!114 &269504726760100725
 MonoBehaviour:
   m_ObjectHideFlags: 0
