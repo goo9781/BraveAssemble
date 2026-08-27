@@ -133,15 +133,21 @@ public class BAHeroVisualController : MonoBehaviour
 
     private void OnAttackPerformed()
     {
-        if (!_isInitialized ||
-            _isAssembled ||
-            !_normalVisual.activeInHierarchy ||
-            !_normalAnimator.isActiveAndEnabled)
+        if (!_isInitialized)
         {
             return;
         }
 
-        _normalAnimator.SetTrigger(_attackParameterHash);
+        Animator activeAnimator = _isAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (!activeAnimator.gameObject.activeInHierarchy ||
+            !activeAnimator.isActiveAndEnabled ||
+            activeAnimator.runtimeAnimatorController == null)
+        {
+            return;
+        }
+
+        activeAnimator.SetTrigger(_attackParameterHash);
     }
 
     private void SetMoving(bool isMoving)
