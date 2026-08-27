@@ -21,6 +21,8 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     private float _nextTargetSearchTime;
     private float _nextAttackTime;
 
+    public bool HasPendingAttack => _pendingAttackTarget != null;
+
     public event Action AttackPerformed;
 
     private void Awake()

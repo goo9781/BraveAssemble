@@ -102,9 +102,16 @@ public class BAHeroVisualController : MonoBehaviour
             return false;
         }
 
-        if (isAssembled)
+        bool previousIsAssembled = _isAssembled;
+        bool hasAssembleStateChanged = previousIsAssembled != isAssembled;
+        Animator inactiveAnimator = previousIsAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (hasAssembleStateChanged &&
+            inactiveAnimator.gameObject.activeInHierarchy &&
+            inactiveAnimator.isActiveAndEnabled &&
+            inactiveAnimator.runtimeAnimatorController != null)
         {
-            _normalAnimator.ResetTrigger(_attackParameterHash);
+            inactiveAnimator.ResetTrigger(_attackParameterHash);
         }
 
         _normalVisual.SetActive(!isAssembled);
@@ -118,6 +125,11 @@ public class BAHeroVisualController : MonoBehaviour
             activeAnimator.runtimeAnimatorController != null)
         {
             activeAnimator.SetBool(_isMovingParameterHash, _isMoving);
+
+            if (hasAssembleStateChanged && _combatController.HasPendingAttack)
+            {
+                activeAnimator.SetTrigger(_attackParameterHash);
+            }
         }
 
         return true;
