@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6704870044612012195}
   - component: {fileID: 1021514759174634969}
   - component: {fileID: 6718226246877264439}
+  - component: {fileID: 2588746542568571869}
   m_Layer: 6
   m_Name: NormalVisual
   m_TagString: Untagged
@@ -114,6 +115,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2588746542568571869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3166584580740659760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970cdfd2cfeac1a429eea37a0e6b26e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAUnitAnimationEventRelay
+  _unitCombatController: {fileID: 335174934868535765}
 --- !u!1 &4861754602539207520
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,6 +139,7 @@ GameObject:
   - component: {fileID: 7415397287905001505}
   - component: {fileID: 9034523868267897872}
   - component: {fileID: 8962981462560938614}
+  - component: {fileID: 4418152593079396779}
   m_Layer: 6
   m_Name: AssembledVisual
   m_TagString: Untagged
@@ -228,6 +243,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4418152593079396779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4861754602539207520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970cdfd2cfeac1a429eea37a0e6b26e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAUnitAnimationEventRelay
+  _unitCombatController: {fileID: 335174934868535765}
 --- !u!1 &6839328885444178745
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +452,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAUnitCombatController
   _unitId: Hero_001
-  _usesAttackAnimationEvent: 0
+  _usesAttackAnimationEvent: 1
 --- !u!114 &4586640577023390548
 MonoBehaviour:
   m_ObjectHideFlags: 0
