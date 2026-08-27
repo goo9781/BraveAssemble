@@ -5,11 +5,16 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BABattleManager : MonoBehaviour
 {
+    private const string _hitVfxPoolKey = "VFX/Hit";
+
+    [SerializeField] private GameObject _hitVfxPrefab;
+
     private readonly Dictionary<BAUnitView, BAUnitViewModel> _boundUnits =
         new Dictionary<BAUnitView, BAUnitViewModel>();
 
     private BADataManager _dataManager;
     private bool _isInitialized;
+    private bool _isHitVfxPoolRegistered;
 
     public static BABattleManager Instance { get; private set; }
 
@@ -156,8 +161,21 @@ public class BABattleManager : MonoBehaviour
             return false;
         }
 
+        bool hasHitVfxPosition = target.TryGetHitVfxPosition(out Vector3 hitVfxPosition);
+
         target.TakeDamage(damage);
         DamageApplied?.Invoke(attacker, target, damage);
+
+        if (hasHitVfxPosition &&
+            TryRegisterHitVfxPool() &&
+            BAPoolManager.Instance != null)
+        {
+            BAPoolManager.Instance.Spawn(
+                _hitVfxPoolKey,
+                hitVfxPosition,
+                Quaternion.identity);
+        }
+
         return true;
     }
 
@@ -358,6 +376,30 @@ public class BABattleManager : MonoBehaviour
         }
 
         unitView.gameObject.SetActive(false);
+    }
+
+    private bool TryRegisterHitVfxPool()
+    {
+        if (BAPoolManager.Instance == null)
+        {
+            return false;
+        }
+
+        if (_hitVfxPrefab == null)
+        {
+            return false;
+        }
+
+        if (_isHitVfxPoolRegistered)
+        {
+            return true;
+        }
+
+        _isHitVfxPoolRegistered = BAPoolManager.Instance.RegisterPool(
+            _hitVfxPoolKey,
+            _hitVfxPrefab,
+            0);
+        return _isHitVfxPoolRegistered;
     }
 
     private void OnDestroy()

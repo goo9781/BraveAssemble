@@ -163,6 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f5e0fca72b1f09499852c9b32acf60b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BABattleManager
+  _hitVfxPrefab: {fileID: 8228708853731321879, guid: c4414cdc127333b44b62fab6b02d45e7, type: 3}
 --- !u!1 &254851858
 GameObject:
   m_ObjectHideFlags: 0

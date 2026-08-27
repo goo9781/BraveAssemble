@@ -4,7 +4,14 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BAUnitView : MonoBehaviour
 {
+    private const string _deathVfxPoolKey = "VFX/EnemyDeath";
+
+    [SerializeField] private Transform _hitVfxPoint;
+    [SerializeField] private GameObject _deathVfxPrefab;
+    [SerializeField] private Transform _deathVfxPoint;
+
     private BAUnitViewModel _viewModel;
+    private bool _isDeathVfxPoolRegistered;
 
     public string Id => _viewModel?.Id;
     public string UnitType => _viewModel?.UnitType;
@@ -19,6 +26,18 @@ public class BAUnitView : MonoBehaviour
 
     public event Action<float, float> HealthChanged;
     public event Action Died;
+
+    public bool TryGetHitVfxPosition(out Vector3 position)
+    {
+        if (_hitVfxPoint == null)
+        {
+            position = default;
+            return false;
+        }
+
+        position = _hitVfxPoint.position;
+        return true;
+    }
 
     public void Bind(BAUnitViewModel viewModel)
     {
@@ -94,6 +113,30 @@ public class BAUnitView : MonoBehaviour
         _viewModel.ResetState();
     }
 
+    private bool TryRegisterDeathVfxPool()
+    {
+        if (BAPoolManager.Instance == null)
+        {
+            return false;
+        }
+
+        if (_deathVfxPrefab == null)
+        {
+            return false;
+        }
+
+        if (_isDeathVfxPoolRegistered)
+        {
+            return true;
+        }
+
+        _isDeathVfxPoolRegistered = BAPoolManager.Instance.RegisterPool(
+            _deathVfxPoolKey,
+            _deathVfxPrefab,
+            0);
+        return _isDeathVfxPoolRegistered;
+    }
+
     private void OnDestroy()
     {
         Unbind();
@@ -101,6 +144,20 @@ public class BAUnitView : MonoBehaviour
 
     private void OnDied()
     {
+        bool hasDeathVfxPosition = _deathVfxPoint != null;
+        Vector3 deathVfxPosition =
+            hasDeathVfxPosition ? _deathVfxPoint.position : default;
+
+        if (hasDeathVfxPosition &&
+            TryRegisterDeathVfxPool() &&
+            BAPoolManager.Instance != null)
+        {
+            BAPoolManager.Instance.Spawn(
+                _deathVfxPoolKey,
+                deathVfxPosition,
+                Quaternion.identity);
+        }
+
         Died?.Invoke();
         gameObject.SetActive(false);
     }
