@@ -365,6 +365,7 @@ GameObject:
   - component: {fileID: 4271449358671490297}
   - component: {fileID: 269504726760100725}
   - component: {fileID: 426687436470616291}
+  - component: {fileID: 2553334013666924280}
   m_Layer: 6
   m_Name: MeleeRobot
   m_TagString: Untagged
@@ -580,6 +581,22 @@ MonoBehaviour:
   _animator: {fileID: 4704818235720615796}
   _movementThreshold: 0.001
   _movementStopDelay: 0.08
+--- !u!114 &2553334013666924280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7366111791891649381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93028d507999dc140bc9c53b11ad29f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAUnitHitFlashController
+  _renderers:
+  - {fileID: 4193364452388971557}
+  _flashColor: {r: 1, g: 0.3529412, b: 0.14901961, a: 0.39215687}
+  _flashDuration: 0.08
 --- !u!1 &7527959807091330306
 GameObject:
   m_ObjectHideFlags: 0

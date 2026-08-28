@@ -271,6 +271,7 @@ GameObject:
   - component: {fileID: 1352061036155145305}
   - component: {fileID: 335174934868535765}
   - component: {fileID: 4586640577023390548}
+  - component: {fileID: 2599566189764462874}
   m_Layer: 6
   m_Name: Hero_Test
   m_TagString: Untagged
@@ -413,6 +414,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAUnitView
   _hitVfxPoint: {fileID: 0}
+  _deathVfxPrefab: {fileID: 0}
+  _deathVfxPoint: {fileID: 0}
 --- !u!50 &1352061036155145305
 Rigidbody2D:
   serializedVersion: 5
@@ -470,3 +473,20 @@ MonoBehaviour:
   _assembledVisual: {fileID: 4861754602539207520}
   _movementThreshold: 0.001
   _movementStopDelay: 0.08
+--- !u!114 &2599566189764462874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839328885444178745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93028d507999dc140bc9c53b11ad29f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAUnitHitFlashController
+  _renderers:
+  - {fileID: 1021514759174634969}
+  - {fileID: 9034523868267897872}
+  _flashColor: {r: 1, g: 0.3529412, b: 0.14901961, a: 0.39215687}
+  _flashDuration: 0.08
