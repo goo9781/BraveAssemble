@@ -255,6 +255,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -380,6 +381,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5c04d29977260e44ba9c064eaa50e14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAHeroCameraController
+  _target: {fileID: 1357801068}
+  _minimumX: -6
+  _maximumX: 6
+  _smoothTime: 0
+  _targetOffsetX: 2
 --- !u!1 &544793228
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,6 +533,7 @@ GameObject:
   m_Component:
   - component: {fileID: 690849057}
   - component: {fileID: 690849058}
+  - component: {fileID: 690849059}
   m_Layer: 0
   m_Name: BG_City_Mid
   m_TagString: Untagged
@@ -596,6 +615,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &690849059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690849056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba4a589d7f73c974ba41f54ee3be6a53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAParallaxLayer
+  _cameraTransform: {fileID: 519420032}
+  _horizontalFollowFactor: 0.45
 --- !u!1 &766890460
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,8 +1187,8 @@ Transform:
   m_GameObject: {fileID: 1203584665}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.3, z: 0}
-  m_LocalScale: {x: 20, y: 1, z: 1}
+  m_LocalPosition: {x: -0.0206, y: -3.3, z: 0}
+  m_LocalScale: {x: 29.838215, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1170,6 +1203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1238995752}
   - component: {fileID: 1238995753}
+  - component: {fileID: 1238995754}
   m_Layer: 0
   m_Name: BG_City_Far
   m_TagString: Untagged
@@ -1251,6 +1285,25 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1238995754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238995751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba4a589d7f73c974ba41f54ee3be6a53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BAParallaxLayer
+  _cameraTransform: {fileID: 519420032}
+  _horizontalFollowFactor: 0.8
+--- !u!4 &1357801068 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4540523004261797015, guid: d0a4ab2fd48c31c46b742df87d5ed567, type: 3}
+  m_PrefabInstance: {fileID: 402661433461166840}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1403670707
 GameObject:
   m_ObjectHideFlags: 0
