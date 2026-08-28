@@ -12,6 +12,8 @@ public class BASupportManager : MonoBehaviour
     [SerializeField] private Transform _entryPoint;
     [SerializeField] private Transform _actionPoint;
     [SerializeField] private Transform _exitPoint;
+    [SerializeField] private Camera _battleCamera;
+    [SerializeField, Min(0f)] private float _normalSupportOutsideMargin = 2.4f;
 
     private BADataManager _dataManager;
     private BAAssetManager _assetManager;
@@ -21,6 +23,7 @@ public class BASupportManager : MonoBehaviour
     private BAAssembleManager _assembleManager;
     private BASupportModel _supportModel;
     private GameObject _activeSupportInstance;
+    private Vector3 _activeNormalSupportActionPosition;
     private bool _isInitialized;
     private bool _isInitializing;
 
@@ -245,9 +248,34 @@ public class BASupportManager : MonoBehaviour
 
     private bool TryUseNormalSupport()
     {
+        Vector3 entryPosition = _entryPoint.position;
+        Vector3 actionPosition = _actionPoint.position;
+        Vector3 exitPosition = _exitPoint.position;
+
+        if (_battleCamera != null)
+        {
+            float outsideMargin = Mathf.Max(0f, _normalSupportOutsideMargin);
+            float entryDistance = Mathf.Abs(
+                entryPosition.z - _battleCamera.transform.position.z);
+            float actionDistance = Mathf.Abs(
+                actionPosition.z - _battleCamera.transform.position.z);
+            float exitDistance = Mathf.Abs(
+                exitPosition.z - _battleCamera.transform.position.z);
+            Vector3 leftViewportPosition = _battleCamera.ViewportToWorldPoint(
+                new Vector3(0f, 0.5f, entryDistance));
+            Vector3 centerViewportPosition = _battleCamera.ViewportToWorldPoint(
+                new Vector3(0.5f, 0.5f, actionDistance));
+            Vector3 rightViewportPosition = _battleCamera.ViewportToWorldPoint(
+                new Vector3(1f, 0.5f, exitDistance));
+
+            entryPosition.x = leftViewportPosition.x - outsideMargin;
+            actionPosition.x = centerViewportPosition.x;
+            exitPosition.x = rightViewportPosition.x + outsideMargin;
+        }
+
         GameObject supportInstance = _poolManager.Spawn(
             _supportModel.PrefabKey,
-            _entryPoint.position,
+            entryPosition,
             _entryPoint.rotation);
 
         if (supportInstance == null)
@@ -268,8 +296,8 @@ public class BASupportManager : MonoBehaviour
         _activeSupportInstance = supportInstance;
 
         if (!movementController.TryStartMovement(
-                _actionPoint.position,
-                _exitPoint.position,
+                actionPosition,
+                exitPosition,
                 _supportModel.MoveSpeed,
                 OnSupportActionReached,
                 OnSupportMovementCompleted))
@@ -278,6 +306,7 @@ public class BASupportManager : MonoBehaviour
             return false;
         }
 
+        _activeNormalSupportActionPosition = actionPosition;
         SupportActiveStateChanged?.Invoke(true);
         return true;
     }
@@ -321,7 +350,7 @@ public class BASupportManager : MonoBehaviour
         {
             _battleManager.TryApplySupportDamage(
                 _heroUnitType,
-                _actionPoint.position,
+                _activeNormalSupportActionPosition,
                 _supportModel.BaseEffectValue,
                 _supportModel.NormalMaxTargetCount,
                 out _);
@@ -347,6 +376,7 @@ public class BASupportManager : MonoBehaviour
     {
         GameObject supportInstance = _activeSupportInstance;
         _activeSupportInstance = null;
+        _activeNormalSupportActionPosition = default;
 
         if (supportInstance == null)
         {

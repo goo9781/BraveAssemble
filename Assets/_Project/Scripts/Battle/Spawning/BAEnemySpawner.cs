@@ -9,6 +9,9 @@ public class BAEnemySpawner : MonoBehaviour
     private const float _initializationTimeout = 10f;
 
     [SerializeField] private string _spawnDataId;
+    [SerializeField] private Camera _battleCamera;
+    [SerializeField, Min(0f)] private float _spawnVisualHalfWidth = 1.76f;
+    [SerializeField, Min(0f)] private float _spawnOutsideMargin = 0.3f;
 
     private readonly HashSet<GameObject> _spawnedEnemies = new HashSet<GameObject>();
 
@@ -132,9 +135,24 @@ public class BAEnemySpawner : MonoBehaviour
                 continue;
             }
 
+            Vector3 spawnPosition = transform.position;
+
+            if (_battleCamera != null)
+            {
+                float spawnDistance = Mathf.Abs(
+                    spawnPosition.z - _battleCamera.transform.position.z);
+                Vector3 rightViewportPosition = _battleCamera.ViewportToWorldPoint(
+                    new Vector3(1f, 0.5f, spawnDistance));
+
+                spawnPosition.x =
+                    rightViewportPosition.x +
+                    Mathf.Max(0f, _spawnVisualHalfWidth) +
+                    Mathf.Max(0f, _spawnOutsideMargin);
+            }
+
             GameObject enemy = BAPoolManager.Instance.Spawn(
                 _spawnData.UnitID,
-                transform.position,
+                spawnPosition,
                 transform.rotation);
 
             if (enemy != null)

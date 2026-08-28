@@ -1055,6 +1055,8 @@ MonoBehaviour:
   _entryPoint: {fileID: 1646127400}
   _actionPoint: {fileID: 1154873375}
   _exitPoint: {fileID: 1083167208}
+  _battleCamera: {fileID: 519420031}
+  _normalSupportOutsideMargin: 2.4
 --- !u!1 &1203584665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1188,7 +1190,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0206, y: -3.3, z: 0}
-  m_LocalScale: {x: 29.838215, y: 1, z: 1}
+  m_LocalScale: {x: 40, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1712,6 +1714,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BAEnemySpawner
   _spawnDataId: EnemySpawn_001
+  _battleCamera: {fileID: 519420031}
+  _spawnVisualHalfWidth: 1.76
+  _spawnOutsideMargin: 0.3
 --- !u!4 &2076112438
 Transform:
   m_ObjectHideFlags: 0
