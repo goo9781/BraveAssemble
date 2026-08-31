@@ -7,6 +7,7 @@ public class BAUIManager : MonoBehaviour
 {
     [SerializeField] private Transform _screenRoot;
     [SerializeField] private GameObject _loadingUI;
+    [SerializeField] private GameObject _startupLoadingUI;
     [SerializeField] private string _mainUIPrefabKey;
     [SerializeField] private string _battleHudPrefabKey;
 
@@ -15,6 +16,7 @@ public class BAUIManager : MonoBehaviour
     private bool _isBattleHudLoading;
     private BAAssetManager _assetManager;
     private BALoadingUIView _loadingUIView;
+    private BALoadingUIView _startupLoadingUIView;
     private GameObject _mainUIInstance;
     private BAMainUIView _mainUIView;
     private GameObject _battleHudInstance;
@@ -39,6 +41,17 @@ public class BAUIManager : MonoBehaviour
         }
 
         Instance = this;
+        bool shouldSkipStartupLoadingUI = BAGameManager.ConsumeShouldSkipStartupLoadingUI();
+
+        if (_startupLoadingUI != null)
+        {
+            _startupLoadingUIView = _startupLoadingUI.GetComponent<BALoadingUIView>();
+
+            if (_startupLoadingUIView == null)
+            {
+                Debug.LogError("Startup Loading UI에서 BALoadingUIView 컴포넌트를 찾을 수 없습니다.");
+            }
+        }
 
         if (_loadingUI != null)
         {
@@ -48,8 +61,41 @@ public class BAUIManager : MonoBehaviour
             {
                 Debug.LogError("Loading UI에서 BALoadingUIView 컴포넌트를 찾을 수 없습니다.");
             }
+        }
 
-            _loadingUI.SetActive(false);
+        if (shouldSkipStartupLoadingUI)
+        {
+            if (_startupLoadingUI != null)
+            {
+                _startupLoadingUI.SetActive(false);
+            }
+
+            if (_loadingUIView != null)
+            {
+                _loadingUIView.ShowRandomImage();
+            }
+
+            if (_loadingUI != null)
+            {
+                _loadingUI.SetActive(true);
+            }
+        }
+        else
+        {
+            if (_startupLoadingUIView != null)
+            {
+                _startupLoadingUIView.ShowRandomImage();
+            }
+
+            if (_startupLoadingUI != null)
+            {
+                _startupLoadingUI.SetActive(true);
+            }
+
+            if (_loadingUI != null)
+            {
+                _loadingUI.SetActive(false);
+            }
         }
     }
 
@@ -103,6 +149,20 @@ public class BAUIManager : MonoBehaviour
         if (_loadingUIView == null)
         {
             Debug.LogError("BALoadingUIView가 없어 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (_startupLoadingUI == null)
+        {
+            Debug.LogError("Startup Loading UI가 설정되지 않아 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (_startupLoadingUIView == null)
+        {
+            Debug.LogError("Startup Loading UI의 BALoadingUIView가 없어 UI 매니저를 초기화할 수 없습니다.");
             _isInitializing = false;
             yield break;
         }
@@ -167,7 +227,6 @@ public class BAUIManager : MonoBehaviour
 
         _isInitialized = true;
         _isInitializing = false;
-        ShowMainUI();
     }
 
     public IEnumerator LoadBattleHudAsync()
@@ -359,10 +418,20 @@ public class BAUIManager : MonoBehaviour
         {
             _loadingUI.SetActive(false);
         }
+
+        if (_startupLoadingUI != null)
+        {
+            _startupLoadingUI.SetActive(false);
+        }
     }
 
     public void ShowLoadingUI()
     {
+        if (_startupLoadingUI != null)
+        {
+            _startupLoadingUI.SetActive(false);
+        }
+
         if (_loadingUI == null)
         {
             Debug.LogError("Loading UI가 설정되지 않아 표시할 수 없습니다.");
@@ -375,7 +444,11 @@ public class BAUIManager : MonoBehaviour
             return;
         }
 
-        _loadingUIView.ShowRandomImage();
+        if (!_loadingUI.activeSelf)
+        {
+            _loadingUIView.ShowRandomImage();
+        }
+
         _loadingUI.SetActive(true);
         _loadingUI.transform.SetAsLastSibling();
     }
@@ -400,6 +473,11 @@ public class BAUIManager : MonoBehaviour
         if (_loadingUI != null)
         {
             _loadingUI.SetActive(false);
+        }
+
+        if (_startupLoadingUI != null)
+        {
+            _startupLoadingUI.SetActive(false);
         }
     }
 
@@ -512,6 +590,7 @@ public class BAUIManager : MonoBehaviour
         }
 
         _loadingUIView = null;
+        _startupLoadingUIView = null;
         _loadingUI = null;
         _assetManager = null;
         _isInitialized = false;

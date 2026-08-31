@@ -25,6 +25,7 @@ public class BAGameManager : MonoBehaviour
     }
 
     private static BAGameEntryMode _nextEntryMode = BAGameEntryMode.Main;
+    private static bool _shouldSkipStartupLoadingUI;
 
     [SerializeField] private BADataManager _dataManager;
     [SerializeField] private BAAssetManager _assetManager;
@@ -44,10 +45,18 @@ public class BAGameManager : MonoBehaviour
 
     public static BAGameManager Instance { get; private set; }
 
+    public static bool ShouldSkipStartupLoadingUI => _shouldSkipStartupLoadingUI;
     public bool IsInitialized => _isInitialized;
     public BAGameState CurrentState => _currentState;
 
     public event Action<BAGameState> StateChanged;
+
+    public static bool ConsumeShouldSkipStartupLoadingUI()
+    {
+        bool shouldSkipStartupLoadingUI = _shouldSkipStartupLoadingUI;
+        _shouldSkipStartupLoadingUI = false;
+        return shouldSkipStartupLoadingUI;
+    }
 
     private void Awake()
     {
@@ -399,6 +408,7 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        _shouldSkipStartupLoadingUI = true;
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(
             activeScene.buildIndex,
             LoadSceneMode.Single);
@@ -419,11 +429,6 @@ public class BAGameManager : MonoBehaviour
         Time.timeScale = 1f;
         ChangeState(BAGameState.Loading);
 
-        if (_uiManager != null && _uiManager.IsInitialized)
-        {
-            _uiManager.ShowLoadingUI();
-        }
-
         yield return null;
 
         Scene activeScene = SceneManager.GetActiveScene();
@@ -434,6 +439,7 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        _shouldSkipStartupLoadingUI = true;
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(
             activeScene.buildIndex,
             LoadSceneMode.Single);
@@ -451,6 +457,7 @@ public class BAGameManager : MonoBehaviour
     {
         Debug.LogError(errorMessage);
         _nextEntryMode = BAGameEntryMode.Main;
+        _shouldSkipStartupLoadingUI = false;
         _isRestarting = false;
         _isReturningToMain = false;
         Time.timeScale = 1f;
