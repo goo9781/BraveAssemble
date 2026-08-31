@@ -44,16 +44,12 @@ public class BAUIManager : MonoBehaviour
         {
             _loadingUIView = _loadingUI.GetComponent<BALoadingUIView>();
 
-            if (_loadingUIView != null)
-            {
-                _loadingUIView.ShowRandomImage();
-            }
-            else
+            if (_loadingUIView == null)
             {
                 Debug.LogError("Loading UI에서 BALoadingUIView 컴포넌트를 찾을 수 없습니다.");
             }
 
-            _loadingUI.SetActive(true);
+            _loadingUI.SetActive(false);
         }
     }
 

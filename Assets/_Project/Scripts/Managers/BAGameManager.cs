@@ -388,11 +388,6 @@ public class BAGameManager : MonoBehaviour
         _nextEntryMode = BAGameEntryMode.RestartBattle;
         ChangeState(BAGameState.Loading);
 
-        if (_uiManager != null && _uiManager.IsInitialized)
-        {
-            _uiManager.ShowLoadingUI();
-        }
-
         yield return null;
         Time.timeScale = 1f;
 
