@@ -7,6 +7,8 @@ public enum BAGameState
 {
     None = 0,
     Initializing,
+    Main,
+    Loading,
     Playing,
     Paused,
     StageCleared,
@@ -28,6 +30,7 @@ public class BAGameManager : MonoBehaviour
 
     private bool _isInitialized;
     private bool _isRestarting;
+    private bool _isStartingGame;
     private BAGameState _currentState = BAGameState.None;
 
     public static BAGameManager Instance { get; private set; }
@@ -106,6 +109,14 @@ public class BAGameManager : MonoBehaviour
             _stageManager.StageCleared -= OnStageCleared;
             _stageManager.StageFailed -= OnStageFailed;
         }
+
+        if (_uiManager != null)
+        {
+            _uiManager.StartGameRequested -= OnStartGameRequested;
+            _uiManager.QuitGameRequested -= OnQuitGameRequested;
+        }
+
+        _isStartingGame = false;
 
         if (Instance == this)
         {
@@ -256,6 +267,51 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        _uiManager.StartGameRequested -= OnStartGameRequested;
+        _uiManager.QuitGameRequested -= OnQuitGameRequested;
+        _uiManager.StartGameRequested += OnStartGameRequested;
+        _uiManager.QuitGameRequested += OnQuitGameRequested;
+        _isInitialized = true;
+        Time.timeScale = 0f;
+        ChangeState(BAGameState.Main);
+        _uiManager.ShowMainUI();
+        Debug.Log("게임 초기화를 완료했습니다.");
+    }
+
+    private void OnStartGameRequested()
+    {
+        if (!_isInitialized ||
+            _currentState != BAGameState.Main ||
+            _isStartingGame)
+        {
+            return;
+        }
+
+        StartCoroutine(StartGameAsync());
+    }
+
+    private void OnQuitGameRequested()
+    {
+        QuitGame();
+    }
+
+    private IEnumerator StartGameAsync()
+    {
+        _isStartingGame = true;
+        Time.timeScale = 0f;
+        ChangeState(BAGameState.Loading);
+        _uiManager.ShowLoadingUI();
+        yield return null;
+
+        yield return _uiManager.LoadBattleHudAsync();
+
+        if (!_uiManager.TryGetBattleHud(out GameObject battleHudInstance) ||
+            battleHudInstance == null)
+        {
+            ReturnToMainAfterStartFailure("전투 HUD 로드에 실패하여 메인 화면으로 돌아갑니다.");
+            yield break;
+        }
+
         if (!_uiManager.TryBindBattleHud(
                 _battleManager,
                 _stageManager,
@@ -263,25 +319,43 @@ public class BAGameManager : MonoBehaviour
                 _assembleManager,
                 _supportManager))
         {
-            Debug.LogError("전투 HUD 바인딩에 실패하여 게임 초기화를 중단합니다.");
+            ReturnToMainAfterStartFailure("전투 HUD 바인딩에 실패하여 메인 화면으로 돌아갑니다.");
             yield break;
         }
 
         if (!_uiManager.TryBindBattleHudCommands(this))
         {
-            Debug.LogError("전투 HUD 명령 바인딩에 실패하여 게임 초기화를 중단합니다.");
+            ReturnToMainAfterStartFailure("전투 HUD 명령 바인딩에 실패하여 메인 화면으로 돌아갑니다.");
             yield break;
         }
 
-        _isInitialized = true;
+        Time.timeScale = 1f;
         ChangeState(BAGameState.Playing);
-        Debug.Log("게임 초기화를 완료했습니다.");
+        _uiManager.ShowBattleHud();
+        _isStartingGame = false;
+        Debug.Log("전투 시작을 완료했습니다.");
+    }
+
+    private void ReturnToMainAfterStartFailure(string errorMessage)
+    {
+        Debug.LogError(errorMessage);
+        Time.timeScale = 0f;
+        ChangeState(BAGameState.Main);
+        _uiManager.ShowMainUI();
+        _isStartingGame = false;
     }
 
     private IEnumerator RestartGameAsync()
     {
         _isRestarting = true;
-        ChangeState(BAGameState.Initializing);
+        ChangeState(BAGameState.Loading);
+
+        if (_uiManager != null && _uiManager.IsInitialized)
+        {
+            _uiManager.ShowLoadingUI();
+        }
+
+        yield return null;
         Time.timeScale = 1f;
 
         Scene activeScene = SceneManager.GetActiveScene();
@@ -320,8 +394,7 @@ public class BAGameManager : MonoBehaviour
 
     private void OnStageCleared()
     {
-        if (_currentState == BAGameState.StageCleared ||
-            _currentState == BAGameState.StageFailed)
+        if (_currentState != BAGameState.Playing)
         {
             return;
         }
@@ -332,8 +405,7 @@ public class BAGameManager : MonoBehaviour
 
     private void OnStageFailed()
     {
-        if (_currentState == BAGameState.StageCleared ||
-            _currentState == BAGameState.StageFailed)
+        if (_currentState != BAGameState.Playing)
         {
             return;
         }

@@ -1,14 +1,22 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public class BAUIManager : MonoBehaviour
 {
-    [SerializeField] private Transform _uiRoot;
+    [SerializeField] private Transform _screenRoot;
+    [SerializeField] private GameObject _loadingUI;
+    [SerializeField] private string _mainUIPrefabKey;
     [SerializeField] private string _battleHudPrefabKey;
 
     private bool _isInitialized;
     private bool _isInitializing;
+    private bool _isBattleHudLoading;
+    private BAAssetManager _assetManager;
+    private BALoadingUIView _loadingUIView;
+    private GameObject _mainUIInstance;
+    private BAMainUIView _mainUIView;
     private GameObject _battleHudInstance;
     private BABattleHudView _battleHudView;
     private BABattleHudViewModel _battleHudViewModel;
@@ -19,6 +27,9 @@ public class BAUIManager : MonoBehaviour
 
     public bool IsInitialized => _isInitialized;
 
+    public event Action StartGameRequested;
+    public event Action QuitGameRequested;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -28,6 +39,22 @@ public class BAUIManager : MonoBehaviour
         }
 
         Instance = this;
+
+        if (_loadingUI != null)
+        {
+            _loadingUIView = _loadingUI.GetComponent<BALoadingUIView>();
+
+            if (_loadingUIView != null)
+            {
+                _loadingUIView.ShowRandomImage();
+            }
+            else
+            {
+                Debug.LogError("Loading UI에서 BALoadingUIView 컴포넌트를 찾을 수 없습니다.");
+            }
+
+            _loadingUI.SetActive(true);
+        }
     }
 
     public IEnumerator InitializeAsync(BAAssetManager assetManager)
@@ -63,9 +90,30 @@ public class BAUIManager : MonoBehaviour
             yield break;
         }
 
-        if (_uiRoot == null)
+        if (_screenRoot == null)
         {
-            Debug.LogError("UI Root가 설정되지 않아 UI 매니저를 초기화할 수 없습니다.");
+            Debug.LogError("Screen Root가 설정되지 않아 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (_loadingUI == null)
+        {
+            Debug.LogError("Loading UI가 설정되지 않아 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (_loadingUIView == null)
+        {
+            Debug.LogError("BALoadingUIView가 없어 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (string.IsNullOrWhiteSpace(_mainUIPrefabKey))
+        {
+            Debug.LogError("Main UI Addressables 키가 비어 있어 UI 매니저를 초기화할 수 없습니다.");
             _isInitializing = false;
             yield break;
         }
@@ -77,26 +125,99 @@ public class BAUIManager : MonoBehaviour
             yield break;
         }
 
+        _assetManager = assetManager;
+        GameObject mainUIPrefab = null;
+
+        yield return _assetManager.LoadPrefabAsync(
+            _mainUIPrefabKey,
+            prefab => mainUIPrefab = prefab);
+
+        if (mainUIPrefab == null)
+        {
+            Debug.LogError($"Main UI 프리팹을 불러오지 못했습니다: {_mainUIPrefabKey}");
+            _assetManager = null;
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (_mainUIInstance == null)
+        {
+            _mainUIInstance = Instantiate(mainUIPrefab, _screenRoot, false);
+        }
+
+        _mainUIView = _mainUIInstance.GetComponent<BAMainUIView>();
+
+        if (_mainUIView == null)
+        {
+            Debug.LogError("Main UI 루트에서 BAMainUIView 컴포넌트를 찾을 수 없습니다.");
+            _assetManager = null;
+            _isInitializing = false;
+            yield break;
+        }
+
+        _mainUIView.StartRequested -= OnMainUIStartRequested;
+        _mainUIView.QuitRequested -= OnMainUIQuitRequested;
+        _mainUIView.StartRequested += OnMainUIStartRequested;
+        _mainUIView.QuitRequested += OnMainUIQuitRequested;
+
+        if (!_mainUIView.Bind())
+        {
+            _mainUIView.StartRequested -= OnMainUIStartRequested;
+            _mainUIView.QuitRequested -= OnMainUIQuitRequested;
+            _assetManager = null;
+            _isInitializing = false;
+            yield break;
+        }
+
+        _isInitialized = true;
+        _isInitializing = false;
+        ShowMainUI();
+    }
+
+    public IEnumerator LoadBattleHudAsync()
+    {
+        if (!_isInitialized || _assetManager == null || !_assetManager.IsInitialized)
+        {
+            Debug.LogError("UI 매니저 또는 BAAssetManager가 초기화되지 않아 전투 HUD를 불러올 수 없습니다.");
+            yield break;
+        }
+
+        if (_battleHudInstance != null)
+        {
+            yield break;
+        }
+
+        if (_isBattleHudLoading)
+        {
+            while (_isBattleHudLoading)
+            {
+                yield return null;
+            }
+
+            yield break;
+        }
+
+        _isBattleHudLoading = true;
         GameObject battleHudPrefab = null;
 
-        yield return assetManager.LoadPrefabAsync(
+        yield return _assetManager.LoadPrefabAsync(
             _battleHudPrefabKey,
             prefab => battleHudPrefab = prefab);
 
         if (battleHudPrefab == null)
         {
             Debug.LogError($"전투 HUD 프리팹을 불러오지 못했습니다: {_battleHudPrefabKey}");
-            _isInitializing = false;
+            _isBattleHudLoading = false;
             yield break;
         }
 
         if (_battleHudInstance == null)
         {
-            _battleHudInstance = Instantiate(battleHudPrefab, _uiRoot, false);
+            _battleHudInstance = Instantiate(battleHudPrefab, _screenRoot, false);
+            _battleHudInstance.SetActive(false);
         }
 
-        _isInitialized = true;
-        _isInitializing = false;
+        _isBattleHudLoading = false;
     }
 
     public bool TryGetBattleHud(out GameObject battleHudInstance)
@@ -222,6 +343,79 @@ public class BAUIManager : MonoBehaviour
         return true;
     }
 
+    public void ShowMainUI()
+    {
+        if (_mainUIInstance == null)
+        {
+            Debug.LogError("Main UI가 준비되지 않아 표시할 수 없습니다.");
+            return;
+        }
+
+        _mainUIInstance.SetActive(true);
+
+        if (_battleHudInstance != null)
+        {
+            _battleHudInstance.SetActive(false);
+        }
+
+        if (_loadingUI != null)
+        {
+            _loadingUI.SetActive(false);
+        }
+    }
+
+    public void ShowLoadingUI()
+    {
+        if (_loadingUI == null)
+        {
+            Debug.LogError("Loading UI가 설정되지 않아 표시할 수 없습니다.");
+            return;
+        }
+
+        if (_loadingUIView == null)
+        {
+            Debug.LogError("BALoadingUIView가 없어 Loading UI를 표시할 수 없습니다.");
+            return;
+        }
+
+        _loadingUIView.ShowRandomImage();
+        _loadingUI.SetActive(true);
+        _loadingUI.transform.SetAsLastSibling();
+    }
+
+    public void ShowBattleHud()
+    {
+        if (_mainUIInstance == null)
+        {
+            Debug.LogError("Main UI가 준비되지 않아 전투 화면으로 전환할 수 없습니다.");
+            return;
+        }
+
+        if (_battleHudInstance == null)
+        {
+            Debug.LogError("전투 HUD가 준비되지 않아 표시할 수 없습니다.");
+            return;
+        }
+
+        _mainUIInstance.SetActive(false);
+        _battleHudInstance.SetActive(true);
+
+        if (_loadingUI != null)
+        {
+            _loadingUI.SetActive(false);
+        }
+    }
+
+    private void OnMainUIStartRequested()
+    {
+        StartGameRequested?.Invoke();
+    }
+
+    private void OnMainUIQuitRequested()
+    {
+        QuitGameRequested?.Invoke();
+    }
+
     private void OnRestartRequested()
     {
         if (_gameManager != null)
@@ -264,6 +458,17 @@ public class BAUIManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_mainUIView != null)
+        {
+            _mainUIView.StartRequested -= OnMainUIStartRequested;
+            _mainUIView.QuitRequested -= OnMainUIQuitRequested;
+            _mainUIView.Unbind();
+        }
+
+        StartGameRequested = null;
+        QuitGameRequested = null;
+        _mainUIView = null;
+
         if (_battleHudView != null)
         {
             _battleHudView.Unbind();
@@ -288,11 +493,24 @@ public class BAUIManager : MonoBehaviour
         _battleHudView = null;
         _battleHudViewModel = null;
 
+        if (_mainUIInstance != null)
+        {
+            Destroy(_mainUIInstance);
+            _mainUIInstance = null;
+        }
+
         if (_battleHudInstance != null)
         {
             Destroy(_battleHudInstance);
             _battleHudInstance = null;
         }
+
+        _loadingUIView = null;
+        _loadingUI = null;
+        _assetManager = null;
+        _isInitialized = false;
+        _isInitializing = false;
+        _isBattleHudLoading = false;
 
         if (Instance == this)
         {

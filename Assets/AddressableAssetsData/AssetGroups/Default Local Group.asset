@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f53954676edc4249a39c22a9a8cbb64
+    m_Address: UI/Main/MainUI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e100090c77100e946b409779626cfa34
     m_Address: Unit/Enemy/MeleeRobot
     m_ReadOnly: 0
