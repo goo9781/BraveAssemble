@@ -602,7 +602,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BALoadingUIView
   _backgroundImage: {fileID: 596113277}
-  _loadingSprites: []
+  _loadingSprites:
+  - {fileID: 21300000, guid: be796cb5bac07d34096c93c1eddd837f, type: 3}
+  - {fileID: 21300000, guid: 14ca379f264830744a15e201281df7fc, type: 3}
+  - {fileID: 21300000, guid: 3503928db99c90848acc9008cd2ac31a, type: 3}
+  - {fileID: 21300000, guid: f75f4d1de8541a24a8a2da885669b45a, type: 3}
+  - {fileID: 21300000, guid: a156d91b2abbd3f4d91db5a21a43118f, type: 3}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
