@@ -11,8 +11,10 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private GameObject _stageClearPanel;
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private Button _stageClearRestartButton;
+    [SerializeField] private Button _stageClearMainButton;
     [SerializeField] private Button _stageClearQuitButton;
     [SerializeField] private Button _gameOverRestartButton;
+    [SerializeField] private Button _gameOverMainButton;
     [SerializeField] private Button _gameOverQuitButton;
     [SerializeField] private Button _skillButton;
     [SerializeField] private TMP_Text _skillNameText;
@@ -21,6 +23,7 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private GameObject _pausePanel;
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _pauseRestartButton;
+    [SerializeField] private Button _pauseMainButton;
     [SerializeField] private Button _pauseQuitButton;
     [SerializeField] private Slider _assembleGaugeSlider;
     [SerializeField] private Button _assembleButton;
@@ -46,8 +49,10 @@ public class BABattleHudView : MonoBehaviour
             _stageClearPanel == null ||
             _gameOverPanel == null ||
             _stageClearRestartButton == null ||
+            _stageClearMainButton == null ||
             _stageClearQuitButton == null ||
             _gameOverRestartButton == null ||
+            _gameOverMainButton == null ||
             _gameOverQuitButton == null ||
             _skillButton == null ||
             _skillNameText == null ||
@@ -56,6 +61,7 @@ public class BABattleHudView : MonoBehaviour
             _pausePanel == null ||
             _resumeButton == null ||
             _pauseRestartButton == null ||
+            _pauseMainButton == null ||
             _pauseQuitButton == null ||
             _assembleGaugeSlider == null ||
             _assembleButton == null ||
@@ -85,13 +91,16 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.SupportActiveStateChanged += OnSupportActiveStateChanged;
 
         _stageClearRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _stageClearMainButton.onClick.AddListener(OnMainButtonClicked);
         _stageClearQuitButton.onClick.AddListener(OnQuitButtonClicked);
         _gameOverRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _gameOverMainButton.onClick.AddListener(OnMainButtonClicked);
         _gameOverQuitButton.onClick.AddListener(OnQuitButtonClicked);
         _skillButton.onClick.AddListener(OnSkillButtonClicked);
         _pauseButton.onClick.AddListener(OnPauseButtonClicked);
         _resumeButton.onClick.AddListener(OnResumeButtonClicked);
         _pauseRestartButton.onClick.AddListener(OnRestartButtonClicked);
+        _pauseMainButton.onClick.AddListener(OnMainButtonClicked);
         _pauseQuitButton.onClick.AddListener(OnQuitButtonClicked);
         _assembleButton.onClick.AddListener(OnAssembleButtonClicked);
         _supportButton.onClick.AddListener(OnSupportButtonClicked);
@@ -129,6 +138,11 @@ public class BABattleHudView : MonoBehaviour
             _stageClearRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
         }
 
+        if (_stageClearMainButton != null)
+        {
+            _stageClearMainButton.onClick.RemoveListener(OnMainButtonClicked);
+        }
+
         if (_stageClearQuitButton != null)
         {
             _stageClearQuitButton.onClick.RemoveListener(OnQuitButtonClicked);
@@ -137,6 +151,11 @@ public class BABattleHudView : MonoBehaviour
         if (_gameOverRestartButton != null)
         {
             _gameOverRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        if (_gameOverMainButton != null)
+        {
+            _gameOverMainButton.onClick.RemoveListener(OnMainButtonClicked);
         }
 
         if (_gameOverQuitButton != null)
@@ -162,6 +181,11 @@ public class BABattleHudView : MonoBehaviour
         if (_pauseRestartButton != null)
         {
             _pauseRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
+        }
+
+        if (_pauseMainButton != null)
+        {
+            _pauseMainButton.onClick.RemoveListener(OnMainButtonClicked);
         }
 
         if (_pauseQuitButton != null)
@@ -205,6 +229,11 @@ public class BABattleHudView : MonoBehaviour
     private void OnQuitButtonClicked()
     {
         _viewModel?.RequestQuit();
+    }
+
+    private void OnMainButtonClicked()
+    {
+        _viewModel?.RequestMain();
     }
 
     private void OnSkillButtonClicked()

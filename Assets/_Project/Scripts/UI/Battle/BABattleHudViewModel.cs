@@ -43,6 +43,7 @@ public class BABattleHudViewModel : IDisposable
     public event Action StageFailed;
     public event Action RestartRequested;
     public event Action QuitRequested;
+    public event Action MainRequested;
     public event Action PauseRequested;
     public event Action ResumeRequested;
     public event Action<bool> PauseStateChanged;
@@ -118,6 +119,16 @@ public class BABattleHudViewModel : IDisposable
         }
 
         QuitRequested?.Invoke();
+    }
+
+    public void RequestMain()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        MainRequested?.Invoke();
     }
 
     public void RequestUseSkill()
@@ -210,6 +221,7 @@ public class BABattleHudViewModel : IDisposable
         _isDisposed = true;
         RestartRequested = null;
         QuitRequested = null;
+        MainRequested = null;
         PauseRequested = null;
         ResumeRequested = null;
     }

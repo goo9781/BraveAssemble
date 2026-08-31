@@ -4395,8 +4395,10 @@ MonoBehaviour:
   _stageClearPanel: {fileID: 7877940725997110459}
   _gameOverPanel: {fileID: 466714823681219934}
   _stageClearRestartButton: {fileID: 4889912818198483097}
+  _stageClearMainButton: {fileID: 920000000000000005}
   _stageClearQuitButton: {fileID: 4236103469317100069}
   _gameOverRestartButton: {fileID: 6619289913693684446}
+  _gameOverMainButton: {fileID: 930000000000000005}
   _gameOverQuitButton: {fileID: 317464724637841899}
   _skillButton: {fileID: 8684323190928400384}
   _skillNameText: {fileID: 7832738694803966043}
@@ -4405,6 +4407,7 @@ MonoBehaviour:
   _pausePanel: {fileID: 6343177865696315314}
   _resumeButton: {fileID: 3089600250103526444}
   _pauseRestartButton: {fileID: 3585408247794023718}
+  _pauseMainButton: {fileID: 910000000000000005}
   _pauseQuitButton: {fileID: 6285103348216647300}
   _assembleGaugeSlider: {fileID: 4099050429887063340}
   _assembleButton: {fileID: 540580716958796247}
