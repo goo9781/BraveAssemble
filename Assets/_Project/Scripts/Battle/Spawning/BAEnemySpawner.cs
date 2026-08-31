@@ -120,15 +120,15 @@ public class BAEnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnEnemiesAsync()
     {
-        if (_spawnData.StartDelay > 0f)
-        {
-            yield return new WaitForSeconds(_spawnData.StartDelay);
-        }
-
-        WaitForSeconds spawnWait = new WaitForSeconds(_spawnData.SpawnInterval);
+        yield return WaitForPlayingDuration(_spawnData.StartDelay);
 
         while (_spawnedCount < _spawnData.TotalSpawnCount)
         {
+            while (!IsGamePlaying())
+            {
+                yield return null;
+            }
+
             if (CountActiveEnemies() >= _spawnData.MaxAliveCount)
             {
                 yield return null;
@@ -170,7 +170,7 @@ public class BAEnemySpawner : MonoBehaviour
                 _spawnedCount++;
             }
 
-            yield return spawnWait;
+            yield return WaitForPlayingDuration(_spawnData.SpawnInterval);
         }
 
         _isSpawnCompleted = true;
@@ -183,6 +183,35 @@ public class BAEnemySpawner : MonoBehaviour
 
         _isCleared = true;
         Cleared?.Invoke();
+    }
+
+    private IEnumerator WaitForPlayingDuration(float duration)
+    {
+        float elapsedTime = 0f;
+
+        while (!IsGamePlaying())
+        {
+            yield return null;
+        }
+
+        while (elapsedTime < duration)
+        {
+            yield return null;
+
+            if (!IsGamePlaying())
+            {
+                continue;
+            }
+
+            elapsedTime += Time.deltaTime;
+        }
+    }
+
+    private bool IsGamePlaying()
+    {
+        return BAGameManager.Instance != null &&
+               BAGameManager.Instance.IsInitialized &&
+               BAGameManager.Instance.CurrentState == BAGameState.Playing;
     }
 
     private void OnEnemyDied()
