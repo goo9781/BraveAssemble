@@ -18,6 +18,14 @@ public enum BAGameState
 [DisallowMultipleComponent]
 public class BAGameManager : MonoBehaviour
 {
+    private enum BAGameEntryMode
+    {
+        Main = 0,
+        RestartBattle
+    }
+
+    private static BAGameEntryMode _nextEntryMode = BAGameEntryMode.Main;
+
     [SerializeField] private BADataManager _dataManager;
     [SerializeField] private BAAssetManager _assetManager;
     [SerializeField] private BAPoolManager _poolManager;
@@ -30,6 +38,7 @@ public class BAGameManager : MonoBehaviour
 
     private bool _isInitialized;
     private bool _isRestarting;
+    private bool _isReturningToMain;
     private bool _isStartingGame;
     private BAGameState _currentState = BAGameState.None;
 
@@ -66,12 +75,27 @@ public class BAGameManager : MonoBehaviour
             return;
         }
 
-        if (_isRestarting)
+        if (_isRestarting || _isReturningToMain)
         {
             return;
         }
 
         StartCoroutine(RestartGameAsync());
+    }
+
+    public void ReturnToMain()
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        if (_isRestarting || _isReturningToMain || _isStartingGame)
+        {
+            return;
+        }
+
+        StartCoroutine(ReturnToMainAsync());
     }
 
     public void QuitGame()
@@ -117,6 +141,8 @@ public class BAGameManager : MonoBehaviour
         }
 
         _isStartingGame = false;
+        _isRestarting = false;
+        _isReturningToMain = false;
 
         if (Instance == this)
         {
@@ -127,6 +153,9 @@ public class BAGameManager : MonoBehaviour
 
     private IEnumerator InitializeGameAsync()
     {
+        BAGameEntryMode entryMode = _nextEntryMode;
+        _nextEntryMode = BAGameEntryMode.Main;
+
         if (_dataManager == null)
         {
             Debug.LogError("BADataManager 참조가 설정되지 않아 게임 초기화를 중단합니다.");
@@ -272,6 +301,14 @@ public class BAGameManager : MonoBehaviour
         _uiManager.StartGameRequested += OnStartGameRequested;
         _uiManager.QuitGameRequested += OnQuitGameRequested;
         _isInitialized = true;
+
+        if (entryMode == BAGameEntryMode.RestartBattle)
+        {
+            StartCoroutine(StartGameAsync());
+            Debug.Log("게임 초기화를 완료했습니다.");
+            yield break;
+        }
+
         Time.timeScale = 0f;
         ChangeState(BAGameState.Main);
         _uiManager.ShowMainUI();
@@ -348,6 +385,7 @@ public class BAGameManager : MonoBehaviour
     private IEnumerator RestartGameAsync()
     {
         _isRestarting = true;
+        _nextEntryMode = BAGameEntryMode.RestartBattle;
         ChangeState(BAGameState.Loading);
 
         if (_uiManager != null && _uiManager.IsInitialized)
@@ -362,8 +400,7 @@ public class BAGameManager : MonoBehaviour
 
         if (activeScene.buildIndex < 0)
         {
-            Debug.LogError("현재 씬이 빌드 설정에 등록되지 않아 재시작할 수 없습니다.");
-            _isRestarting = false;
+            HandleSceneReloadFailure("현재 씬이 빌드 설정에 등록되지 않아 재시작할 수 없습니다.");
             yield break;
         }
 
@@ -373,12 +410,61 @@ public class BAGameManager : MonoBehaviour
 
         if (loadOperation == null)
         {
-            Debug.LogError("현재 씬의 비동기 로드를 시작하지 못했습니다.");
-            _isRestarting = false;
+            HandleSceneReloadFailure("현재 씬의 비동기 로드를 시작하지 못했습니다.");
             yield break;
         }
 
         yield return loadOperation;
+    }
+
+    private IEnumerator ReturnToMainAsync()
+    {
+        _isReturningToMain = true;
+        _nextEntryMode = BAGameEntryMode.Main;
+        Time.timeScale = 1f;
+        ChangeState(BAGameState.Loading);
+
+        if (_uiManager != null && _uiManager.IsInitialized)
+        {
+            _uiManager.ShowLoadingUI();
+        }
+
+        yield return null;
+
+        Scene activeScene = SceneManager.GetActiveScene();
+
+        if (activeScene.buildIndex < 0)
+        {
+            HandleSceneReloadFailure("현재 씬이 빌드 설정에 등록되지 않아 메인 화면으로 이동할 수 없습니다.");
+            yield break;
+        }
+
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(
+            activeScene.buildIndex,
+            LoadSceneMode.Single);
+
+        if (loadOperation == null)
+        {
+            HandleSceneReloadFailure("현재 씬의 비동기 로드를 시작하지 못했습니다.");
+            yield break;
+        }
+
+        yield return loadOperation;
+    }
+
+    private void HandleSceneReloadFailure(string errorMessage)
+    {
+        Debug.LogError(errorMessage);
+        _nextEntryMode = BAGameEntryMode.Main;
+        _isRestarting = false;
+        _isReturningToMain = false;
+        Time.timeScale = 1f;
+        ChangeState(BAGameState.Main);
+
+        if (_uiManager != null && _uiManager.IsInitialized)
+        {
+            _uiManager.ShowMainUI();
+        }
     }
 
     private void ChangeState(BAGameState nextState)

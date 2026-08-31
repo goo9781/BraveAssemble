@@ -335,6 +335,7 @@ public class BAUIManager : MonoBehaviour
         _gameManager = gameManager;
         _battleHudViewModel.RestartRequested += OnRestartRequested;
         _battleHudViewModel.QuitRequested += OnQuitRequested;
+        _battleHudViewModel.MainRequested += OnMainRequested;
         _battleHudViewModel.PauseRequested += OnPauseRequested;
         _battleHudViewModel.ResumeRequested += OnResumeRequested;
         _gameManager.StateChanged += OnGameStateChanged;
@@ -432,6 +433,14 @@ public class BAUIManager : MonoBehaviour
         }
     }
 
+    private void OnMainRequested()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.ReturnToMain();
+        }
+    }
+
     private void OnPauseRequested()
     {
         if (_gameManager != null)
@@ -478,6 +487,7 @@ public class BAUIManager : MonoBehaviour
         {
             _battleHudViewModel.RestartRequested -= OnRestartRequested;
             _battleHudViewModel.QuitRequested -= OnQuitRequested;
+            _battleHudViewModel.MainRequested -= OnMainRequested;
             _battleHudViewModel.PauseRequested -= OnPauseRequested;
             _battleHudViewModel.ResumeRequested -= OnResumeRequested;
         }
