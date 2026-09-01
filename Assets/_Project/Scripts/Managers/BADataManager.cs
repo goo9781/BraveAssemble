@@ -10,6 +10,7 @@ public class BADataManager : MonoBehaviour
     private const string _skillTableResourcePath = "JsonOutput/SkillTable";
     private const string _assembleTableResourcePath = "JsonOutput/AssembleTable";
     private const string _supportTableResourcePath = "JsonOutput/SupportTable";
+    private const string _stageBriefingTableResourcePath = "JsonOutput/StageBriefingTable";
 
     [Serializable]
     private class SerializationWrapper<T> where T : BAGameDataBase
@@ -26,6 +27,8 @@ public class BADataManager : MonoBehaviour
         new Dictionary<string, BAAssembleData>();
     private readonly Dictionary<string, BASupportData> _supportDataById =
         new Dictionary<string, BASupportData>();
+    private readonly Dictionary<string, BAStageBriefingData> _stageBriefingDataById =
+        new Dictionary<string, BAStageBriefingData>();
 
     private bool _isInitialized;
     private bool _isInitializing;
@@ -79,6 +82,7 @@ public class BADataManager : MonoBehaviour
         bool skillTableLoaded = false;
         bool assembleTableLoaded = false;
         bool supportTableLoaded = false;
+        bool stageBriefingTableLoaded = false;
 
         yield return LoadTableAsync(
             _unitTableResourcePath,
@@ -130,6 +134,17 @@ public class BADataManager : MonoBehaviour
             succeeded => supportTableLoaded = succeeded);
 
         if (!supportTableLoaded)
+        {
+            _isInitializing = false;
+            yield break;
+        }
+
+        yield return LoadTableAsync(
+            _stageBriefingTableResourcePath,
+            _stageBriefingDataById,
+            succeeded => stageBriefingTableLoaded = succeeded);
+
+        if (!stageBriefingTableLoaded)
         {
             _isInitializing = false;
             yield break;
@@ -197,6 +212,18 @@ public class BADataManager : MonoBehaviour
         }
 
         return _supportDataById.TryGetValue(id, out supportData);
+    }
+
+    public bool TryGetStageBriefingData(string id, out BAStageBriefingData data)
+    {
+        data = null;
+
+        if (!_isInitialized || string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        return _stageBriefingDataById.TryGetValue(id, out data);
     }
 
     private IEnumerator LoadTableAsync<T>(
