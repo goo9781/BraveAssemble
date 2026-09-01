@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "Stage_001",
+    "DisplayName": "1-1",
+    "EnemyInfo": "소형 적",
+    "EnemyScale": "다수 출현",
+    "VictoryCondition": "모든 적 처치",
+    "RecommendedSupport": "광역 공격형",
+    "RewardInfo": "방위 코인 100"
+  }
+]
