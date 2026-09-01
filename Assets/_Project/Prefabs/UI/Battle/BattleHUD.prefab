@@ -5442,7 +5442,9 @@ MonoBehaviour:
   _heroHpText: {fileID: 1117755517518741394}
   _remainingEnemyText: {fileID: 8221975521066100526}
   _stageClearPanel: {fileID: 7877940725997110459}
+  _stageClearResultText: {fileID: 940000000000000004}
   _gameOverPanel: {fileID: 466714823681219934}
+  _gameOverResultText: {fileID: 950000000000000004}
   _stageClearRestartButton: {fileID: 4889912818198483097}
   _stageClearMainButton: {fileID: 920000000000000005}
   _stageClearQuitButton: {fileID: 4236103469317100069}

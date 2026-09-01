@@ -9,7 +9,9 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private TMP_Text _heroHpText;
     [SerializeField] private TMP_Text _remainingEnemyText;
     [SerializeField] private GameObject _stageClearPanel;
+    [SerializeField] private TMP_Text _stageClearResultText;
     [SerializeField] private GameObject _gameOverPanel;
+    [SerializeField] private TMP_Text _gameOverResultText;
     [SerializeField] private Button _stageClearRestartButton;
     [SerializeField] private Button _stageClearMainButton;
     [SerializeField] private Button _stageClearQuitButton;
@@ -47,7 +49,9 @@ public class BABattleHudView : MonoBehaviour
             _heroHpText == null ||
             _remainingEnemyText == null ||
             _stageClearPanel == null ||
+            _stageClearResultText == null ||
             _gameOverPanel == null ||
+            _gameOverResultText == null ||
             _stageClearRestartButton == null ||
             _stageClearMainButton == null ||
             _stageClearQuitButton == null ||
@@ -129,6 +133,16 @@ public class BABattleHudView : MonoBehaviour
         UpdatePauseState(_viewModel.IsPaused);
 
         return true;
+    }
+
+    public void SetStageClearResult(string resultText)
+    {
+        _stageClearResultText.text = resultText ?? string.Empty;
+    }
+
+    public void SetGameOverResult(string resultText)
+    {
+        _gameOverResultText.text = resultText ?? string.Empty;
     }
 
     public void Unbind()
