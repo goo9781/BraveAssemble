@@ -480,7 +480,7 @@ public class BAGameManager : MonoBehaviour
         _shouldSkipStartupLoadingUI = false;
         _isRestarting = false;
         _isReturningToMain = false;
-        Time.timeScale = 1f;
+        Time.timeScale = 0f;
         ChangeState(BAGameState.Main);
 
         if (_uiManager != null && _uiManager.IsInitialized)
@@ -502,7 +502,8 @@ public class BAGameManager : MonoBehaviour
 
     private void OnStageCleared()
     {
-        if (_currentState != BAGameState.Playing)
+        if (_currentState != BAGameState.Playing &&
+            _currentState != BAGameState.Paused)
         {
             return;
         }
@@ -513,7 +514,8 @@ public class BAGameManager : MonoBehaviour
 
     private void OnStageFailed()
     {
-        if (_currentState != BAGameState.Playing)
+        if (_currentState != BAGameState.Playing &&
+            _currentState != BAGameState.Paused)
         {
             return;
         }
