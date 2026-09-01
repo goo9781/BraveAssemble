@@ -8,7 +8,7 @@ public class BAStageBriefingUIView : MonoBehaviour
 {
     [SerializeField] private TMP_Text _stageNameText;
     [SerializeField] private TMP_Text _enemyInfoText;
-    [SerializeField] private TMP_Text _spawnInfoText;
+    [SerializeField] private TMP_Text _enemyScaleText;
     [SerializeField] private TMP_Text _victoryConditionText;
     [SerializeField] private TMP_Text _recommendedSupportText;
     [SerializeField] private TMP_Text _rewardText;
@@ -24,7 +24,7 @@ public class BAStageBriefingUIView : MonoBehaviour
     {
         if (_stageNameText == null ||
             _enemyInfoText == null ||
-            _spawnInfoText == null ||
+            _enemyScaleText == null ||
             _victoryConditionText == null ||
             _recommendedSupportText == null ||
             _rewardText == null ||
@@ -74,14 +74,14 @@ public class BAStageBriefingUIView : MonoBehaviour
     public void SetStageInfo(
         string stageName,
         string enemyInfo,
-        string spawnInfo,
+        string enemyScale,
         string victoryCondition,
         string recommendedSupport,
         string rewardInfo)
     {
         _stageNameText.text = stageName;
         _enemyInfoText.text = enemyInfo;
-        _spawnInfoText.text = spawnInfo;
+        _enemyScaleText.text = enemyScale;
         _victoryConditionText.text = victoryCondition;
         _recommendedSupportText.text = recommendedSupport;
         _rewardText.text = rewardInfo;

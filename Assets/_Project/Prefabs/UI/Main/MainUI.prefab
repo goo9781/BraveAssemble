@@ -241,7 +241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BAStageBriefingUIView
   _stageNameText: {fileID: 910000000000000013}
   _enemyInfoText: {fileID: 910000000000000017}
-  _spawnInfoText: {fileID: 910000000000000021}
+  _enemyScaleText: {fileID: 910000000000000021}
   _victoryConditionText: {fileID: 910000000000000025}
   _recommendedSupportText: {fileID: 910000000000000029}
   _rewardText: {fileID: 910000000000000033}
