@@ -6,7 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BAEnemySpawner : MonoBehaviour
 {
-    private const float _initializationTimeout = 10f;
+    private const float _initializationWarningTime = 10f;
 
     [SerializeField] private string _spawnDataId;
     [SerializeField] private Camera _battleCamera;
@@ -36,18 +36,20 @@ public class BAEnemySpawner : MonoBehaviour
     private IEnumerator Start()
     {
         float elapsedTime = 0f;
+        bool hasLoggedInitializationWarning = false;
 
-        while ((BAGameManager.Instance == null || !BAGameManager.Instance.IsInitialized) &&
-               elapsedTime < _initializationTimeout)
+        while (BAGameManager.Instance == null || !BAGameManager.Instance.IsInitialized)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            yield return null;
-        }
 
-        if (BAGameManager.Instance == null || !BAGameManager.Instance.IsInitialized)
-        {
-            Debug.LogError("게임 매니저 초기화 대기 시간이 초과되어 적 스포너 초기화를 중단합니다.");
-            yield break;
+            if (!hasLoggedInitializationWarning &&
+                elapsedTime >= _initializationWarningTime)
+            {
+                Debug.LogWarning("게임 매니저 초기화가 지연되어 적 스포너가 계속 대기 중입니다.");
+                hasLoggedInitializationWarning = true;
+            }
+
+            yield return null;
         }
 
         if (string.IsNullOrWhiteSpace(_spawnDataId))
