@@ -1705,6 +1705,7 @@ MonoBehaviour:
   _assembleManager: {fileID: 1175162647}
   _supportManager: {fileID: 1184549151}
   _uiManager: {fileID: 865788484}
+  _minimumLoadingDuration: 1
 --- !u!1 &1557383307
 GameObject:
   m_ObjectHideFlags: 0

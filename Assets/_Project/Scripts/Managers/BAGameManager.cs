@@ -36,11 +36,13 @@ public class BAGameManager : MonoBehaviour
     [SerializeField] private BAAssembleManager _assembleManager;
     [SerializeField] private BASupportManager _supportManager;
     [SerializeField] private BAUIManager _uiManager;
+    [SerializeField, Min(0f)] private float _minimumLoadingDuration = 1f;
 
     private bool _isInitialized;
     private bool _isRestarting;
     private bool _isReturningToMain;
     private bool _isStartingGame;
+    private float _loadingStartTime;
     private BAGameState _currentState = BAGameState.None;
 
     public static BAGameManager Instance { get; private set; }
@@ -68,6 +70,7 @@ public class BAGameManager : MonoBehaviour
 
         Instance = this;
         Time.timeScale = 1f;
+        _loadingStartTime = Time.unscaledTime;
     }
 
     private void Start()
@@ -313,11 +316,12 @@ public class BAGameManager : MonoBehaviour
 
         if (entryMode == BAGameEntryMode.RestartBattle)
         {
-            StartCoroutine(StartGameAsync());
+            StartCoroutine(StartGameAsync(false));
             Debug.Log("게임 초기화를 완료했습니다.");
             yield break;
         }
 
+        yield return WaitForMinimumLoadingDuration();
         Time.timeScale = 0f;
         ChangeState(BAGameState.Main);
         _uiManager.ShowMainUI();
@@ -341,8 +345,13 @@ public class BAGameManager : MonoBehaviour
         QuitGame();
     }
 
-    private IEnumerator StartGameAsync()
+    private IEnumerator StartGameAsync(bool shouldResetLoadingStartTime = true)
     {
+        if (shouldResetLoadingStartTime)
+        {
+            _loadingStartTime = Time.unscaledTime;
+        }
+
         _isStartingGame = true;
         Time.timeScale = 0f;
         ChangeState(BAGameState.Loading);
@@ -375,6 +384,7 @@ public class BAGameManager : MonoBehaviour
             yield break;
         }
 
+        yield return WaitForMinimumLoadingDuration();
         Time.timeScale = 1f;
         ChangeState(BAGameState.Playing);
         _uiManager.ShowBattleHud();
@@ -389,6 +399,16 @@ public class BAGameManager : MonoBehaviour
         ChangeState(BAGameState.Main);
         _uiManager.ShowMainUI();
         _isStartingGame = false;
+    }
+
+    private IEnumerator WaitForMinimumLoadingDuration()
+    {
+        float minimumLoadingDuration = Mathf.Max(0f, _minimumLoadingDuration);
+
+        while (Time.unscaledTime - _loadingStartTime < minimumLoadingDuration)
+        {
+            yield return null;
+        }
     }
 
     private IEnumerator RestartGameAsync()
