@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class BABattleHudViewModel : IDisposable
 {
@@ -13,10 +14,19 @@ public class BABattleHudViewModel : IDisposable
     private BAUnitViewModel _heroViewModel;
     private bool _isDisposed;
     private bool _isPaused;
+    private int _totalEnemyCount;
+    private BAGameState _currentGameState = BAGameState.None;
+    private float _battleStartTime;
+    private float _pauseStartTime;
+    private float _accumulatedPauseTime;
+    private float _battleElapsedTime;
+    private bool _hasBattleStarted;
 
     public float HeroMaxHealth => _heroViewModel?.MaxHealth ?? 0f;
     public float HeroCurrentHealth => _heroViewModel?.CurrentHealth ?? 0f;
     public int RemainingEnemyCount => _stageManager.RemainingEnemyCount;
+    public float BattleElapsedTime => _battleElapsedTime;
+    public int DefeatedEnemyCount => Mathf.Max(0, _totalEnemyCount - RemainingEnemyCount);
     public bool IsStageCleared => _stageManager.IsStageCleared;
     public bool IsStageFailed => _stageManager.IsStageFailed;
     public string SkillDisplayName => _skillManager.DisplayName;
@@ -81,6 +91,8 @@ public class BABattleHudViewModel : IDisposable
         {
             throw new ArgumentException("서포트 매니저가 초기화되지 않았습니다.", nameof(supportManager));
         }
+
+        _totalEnemyCount = Mathf.Max(0, _stageManager.RemainingEnemyCount);
 
         _battleManager.UnitBound += OnUnitBound;
         _stageManager.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
@@ -183,6 +195,59 @@ public class BABattleHudViewModel : IDisposable
 
     public void UpdateGameState(BAGameState gameState)
     {
+        if (_currentGameState == gameState)
+        {
+            return;
+        }
+
+        BAGameState previousGameState = _currentGameState;
+        _currentGameState = gameState;
+
+        if (gameState == BAGameState.Playing)
+        {
+            if (!_hasBattleStarted)
+            {
+                _battleStartTime = Time.unscaledTime;
+                _pauseStartTime = 0f;
+                _accumulatedPauseTime = 0f;
+                _battleElapsedTime = 0f;
+                _hasBattleStarted = true;
+            }
+            else if (previousGameState == BAGameState.Paused)
+            {
+                _accumulatedPauseTime += Mathf.Max(0f, Time.unscaledTime - _pauseStartTime);
+                _pauseStartTime = 0f;
+            }
+        }
+        else if (gameState == BAGameState.Paused)
+        {
+            if (_hasBattleStarted && previousGameState == BAGameState.Playing)
+            {
+                _pauseStartTime = Time.unscaledTime;
+            }
+        }
+        else if (gameState == BAGameState.StageCleared ||
+                 gameState == BAGameState.StageFailed)
+        {
+            if (_hasBattleStarted)
+            {
+                float accumulatedPauseTime = _accumulatedPauseTime;
+
+                if (previousGameState == BAGameState.Paused)
+                {
+                    accumulatedPauseTime += Mathf.Max(0f, Time.unscaledTime - _pauseStartTime);
+                }
+
+                _battleElapsedTime = Mathf.Max(
+                    0f,
+                    Time.unscaledTime - _battleStartTime - accumulatedPauseTime);
+            }
+            else
+            {
+                _battleElapsedTime = 0f;
+            }
+        }
+
         bool isPaused = gameState == BAGameState.Paused;
 
         if (_isPaused == isPaused)
@@ -255,6 +320,7 @@ public class BABattleHudViewModel : IDisposable
 
     private void OnRemainingEnemyCountChanged(int remainingEnemyCount)
     {
+        _totalEnemyCount = Mathf.Max(_totalEnemyCount, Mathf.Max(0, remainingEnemyCount));
         RemainingEnemyCountChanged?.Invoke(remainingEnemyCount);
     }
 

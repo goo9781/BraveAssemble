@@ -287,6 +287,12 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnStageCleared()
     {
+        if (_viewModel != null)
+        {
+            SetStageClearResult(
+                $"클리어 시간: {_viewModel.BattleElapsedTime:F1}초\n처치 적: {_viewModel.DefeatedEnemyCount}");
+        }
+
         _stageClearPanel.SetActive(true);
         _skillButton.interactable = false;
         _pausePanel.SetActive(false);
@@ -298,6 +304,12 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnStageFailed()
     {
+        if (_viewModel != null)
+        {
+            SetGameOverResult(
+                $"생존 시간: {_viewModel.BattleElapsedTime:F1}초\n처치 적: {_viewModel.DefeatedEnemyCount}");
+        }
+
         _gameOverPanel.SetActive(true);
         _skillButton.interactable = false;
         _pausePanel.SetActive(false);
