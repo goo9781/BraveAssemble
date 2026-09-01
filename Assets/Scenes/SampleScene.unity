@@ -994,6 +994,7 @@ MonoBehaviour:
   _startupLoadingUI: {fileID: 2100000001}
   _mainUIPrefabKey: UI/Main/MainUI
   _battleHudPrefabKey: UI/Battle/BattleHUD
+  _stageBriefingDataId: Stage_001
 --- !u!1 &1083167207
 GameObject:
   m_ObjectHideFlags: 0

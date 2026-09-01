@@ -10,6 +10,7 @@ public class BAUIManager : MonoBehaviour
     [SerializeField] private GameObject _startupLoadingUI;
     [SerializeField] private string _mainUIPrefabKey;
     [SerializeField] private string _battleHudPrefabKey;
+    [SerializeField] private string _stageBriefingDataId;
 
     private bool _isInitialized;
     private bool _isInitializing;
@@ -164,6 +165,20 @@ public class BAUIManager : MonoBehaviour
         if (_startupLoadingUIView == null)
         {
             Debug.LogError("Startup Loading UI의 BALoadingUIView가 없어 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (BADataManager.Instance == null || !BADataManager.Instance.IsInitialized)
+        {
+            Debug.LogError("BADataManager가 없거나 초기화되지 않아 UI 매니저를 초기화할 수 없습니다.");
+            _isInitializing = false;
+            yield break;
+        }
+
+        if (string.IsNullOrWhiteSpace(_stageBriefingDataId))
+        {
+            Debug.LogError("스테이지 브리핑 데이터 ID가 비어 있어 UI 매니저를 초기화할 수 없습니다.");
             _isInitializing = false;
             yield break;
         }
@@ -465,6 +480,28 @@ public class BAUIManager : MonoBehaviour
             Debug.LogError("스테이지 브리핑 UI가 준비되지 않아 표시할 수 없습니다.");
             return;
         }
+
+        if (BADataManager.Instance == null || !BADataManager.Instance.IsInitialized)
+        {
+            Debug.LogError("BADataManager가 없거나 초기화되지 않아 스테이지 브리핑을 표시할 수 없습니다.");
+            return;
+        }
+
+        if (!BADataManager.Instance.TryGetStageBriefingData(
+                _stageBriefingDataId,
+                out BAStageBriefingData stageBriefingData))
+        {
+            Debug.LogError($"스테이지 브리핑 데이터를 찾을 수 없습니다: {_stageBriefingDataId}");
+            return;
+        }
+
+        _stageBriefingUIView.SetStageInfo(
+            stageBriefingData.DisplayName,
+            stageBriefingData.EnemyInfo,
+            stageBriefingData.EnemyScale,
+            stageBriefingData.VictoryCondition,
+            stageBriefingData.RecommendedSupport,
+            stageBriefingData.RewardInfo);
 
         ShowMainUI();
         _stageBriefingUIView.Show();
