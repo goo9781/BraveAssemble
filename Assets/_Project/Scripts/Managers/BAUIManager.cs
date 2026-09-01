@@ -19,6 +19,7 @@ public class BAUIManager : MonoBehaviour
     private BALoadingUIView _startupLoadingUIView;
     private GameObject _mainUIInstance;
     private BAMainUIView _mainUIView;
+    private BAStageBriefingUIView _stageBriefingUIView;
     private GameObject _battleHudInstance;
     private BABattleHudView _battleHudView;
     private BABattleHudViewModel _battleHudViewModel;
@@ -211,6 +212,17 @@ public class BAUIManager : MonoBehaviour
             yield break;
         }
 
+        _stageBriefingUIView =
+            _mainUIInstance.GetComponentInChildren<BAStageBriefingUIView>(true);
+
+        if (_stageBriefingUIView == null)
+        {
+            Debug.LogError("Main UI에서 BAStageBriefingUIView 컴포넌트를 찾을 수 없습니다.");
+            _assetManager = null;
+            _isInitializing = false;
+            yield break;
+        }
+
         _mainUIView.StartRequested -= OnMainUIStartRequested;
         _mainUIView.QuitRequested -= OnMainUIQuitRequested;
         _mainUIView.StartRequested += OnMainUIStartRequested;
@@ -220,6 +232,26 @@ public class BAUIManager : MonoBehaviour
         {
             _mainUIView.StartRequested -= OnMainUIStartRequested;
             _mainUIView.QuitRequested -= OnMainUIQuitRequested;
+            _assetManager = null;
+            _isInitializing = false;
+            yield break;
+        }
+
+        _stageBriefingUIView.StartBattleRequested -=
+            OnStageBriefingStartBattleRequested;
+        _stageBriefingUIView.BackRequested -= OnStageBriefingBackRequested;
+        _stageBriefingUIView.StartBattleRequested +=
+            OnStageBriefingStartBattleRequested;
+        _stageBriefingUIView.BackRequested += OnStageBriefingBackRequested;
+
+        if (!_stageBriefingUIView.Bind())
+        {
+            _stageBriefingUIView.StartBattleRequested -=
+                OnStageBriefingStartBattleRequested;
+            _stageBriefingUIView.BackRequested -= OnStageBriefingBackRequested;
+            _mainUIView.StartRequested -= OnMainUIStartRequested;
+            _mainUIView.QuitRequested -= OnMainUIQuitRequested;
+            _mainUIView.Unbind();
             _assetManager = null;
             _isInitializing = false;
             yield break;
@@ -408,6 +440,7 @@ public class BAUIManager : MonoBehaviour
         }
 
         _mainUIInstance.SetActive(true);
+        _stageBriefingUIView?.Hide();
 
         if (_battleHudInstance != null)
         {
@@ -423,6 +456,18 @@ public class BAUIManager : MonoBehaviour
         {
             _startupLoadingUI.SetActive(false);
         }
+    }
+
+    public void ShowStageBriefing()
+    {
+        if (_stageBriefingUIView == null)
+        {
+            Debug.LogError("스테이지 브리핑 UI가 준비되지 않아 표시할 수 없습니다.");
+            return;
+        }
+
+        ShowMainUI();
+        _stageBriefingUIView.Show();
     }
 
     public void ShowLoadingUI()
@@ -483,12 +528,22 @@ public class BAUIManager : MonoBehaviour
 
     private void OnMainUIStartRequested()
     {
-        StartGameRequested?.Invoke();
+        ShowStageBriefing();
     }
 
     private void OnMainUIQuitRequested()
     {
         QuitGameRequested?.Invoke();
+    }
+
+    private void OnStageBriefingStartBattleRequested()
+    {
+        StartGameRequested?.Invoke();
+    }
+
+    private void OnStageBriefingBackRequested()
+    {
+        ShowMainUI();
     }
 
     private void OnRestartRequested()
@@ -548,9 +603,18 @@ public class BAUIManager : MonoBehaviour
             _mainUIView.Unbind();
         }
 
+        if (_stageBriefingUIView != null)
+        {
+            _stageBriefingUIView.StartBattleRequested -=
+                OnStageBriefingStartBattleRequested;
+            _stageBriefingUIView.BackRequested -= OnStageBriefingBackRequested;
+            _stageBriefingUIView.Unbind();
+        }
+
         StartGameRequested = null;
         QuitGameRequested = null;
         _mainUIView = null;
+        _stageBriefingUIView = null;
 
         if (_battleHudView != null)
         {
