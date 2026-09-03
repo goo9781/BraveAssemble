@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,6 +29,9 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private Button _pauseMainButton;
     [SerializeField] private Button _pauseQuitButton;
     [SerializeField] private Slider _assembleGaugeSlider;
+    [SerializeField] private GameObject _assembleReadyPanel;
+    [SerializeField] private RectTransform _assembleReadyBackground;
+    [SerializeField] private CanvasGroup _assembleReadyCanvasGroup;
     [SerializeField] private Button _assembleButton;
     [SerializeField] private TMP_Text _assembleNameText;
     [SerializeField] private TMP_Text _assembleDurationText;
@@ -36,6 +40,9 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private TMP_Text _supportCooldownText;
 
     private BABattleHudViewModel _viewModel;
+    private Sequence _assembleReadySequence;
+    private Tween _assembleButtonLoopTween;
+    private bool _wasAssembleReady;
 
     public bool Bind(BABattleHudViewModel viewModel)
     {
@@ -68,6 +75,9 @@ public class BABattleHudView : MonoBehaviour
             _pauseMainButton == null ||
             _pauseQuitButton == null ||
             _assembleGaugeSlider == null ||
+            _assembleReadyPanel == null ||
+            _assembleReadyBackground == null ||
+            _assembleReadyCanvasGroup == null ||
             _assembleButton == null ||
             _assembleNameText == null ||
             _assembleDurationText == null ||
@@ -82,6 +92,7 @@ public class BABattleHudView : MonoBehaviour
         Unbind();
 
         _viewModel = viewModel;
+        ResetAssembleReadyState();
         _viewModel.HeroHealthChanged += OnHeroHealthChanged;
         _viewModel.RemainingEnemyCountChanged += OnRemainingEnemyCountChanged;
         _viewModel.StageCleared += OnStageCleared;
@@ -147,6 +158,8 @@ public class BABattleHudView : MonoBehaviour
 
     public void Unbind()
     {
+        ResetAssembleReadyState();
+
         if (_stageClearRestartButton != null)
         {
             _stageClearRestartButton.onClick.RemoveListener(OnRestartButtonClicked);
@@ -267,6 +280,8 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnAssembleButtonClicked()
     {
+        KillAssembleReadyTweens();
+        _assembleButton.interactable = false;
         _viewModel?.RequestAssemble();
     }
 
@@ -299,6 +314,7 @@ public class BABattleHudView : MonoBehaviour
         _pauseButton.interactable = false;
         _assembleButton.interactable = false;
         _assembleButton.gameObject.SetActive(false);
+        ResetAssembleReadyState();
         _supportButton.interactable = false;
     }
 
@@ -316,6 +332,7 @@ public class BABattleHudView : MonoBehaviour
         _pauseButton.interactable = false;
         _assembleButton.interactable = false;
         _assembleButton.gameObject.SetActive(false);
+        ResetAssembleReadyState();
         _supportButton.interactable = false;
     }
 
@@ -343,6 +360,7 @@ public class BABattleHudView : MonoBehaviour
     {
         if (isAssembled)
         {
+            ResetAssembleReadyState();
             UpdateAssembleDuration(
                 _viewModel.AssembleRemainingDuration,
                 _viewModel.AssembleDuration);
@@ -470,15 +488,149 @@ public class BABattleHudView : MonoBehaviour
 
     private void UpdateAssembleButtonState()
     {
-        bool canAssemble =
-            _viewModel != null &&
+        bool isAssembleReady = IsAssembleReady();
+
+        if (isAssembleReady && !_wasAssembleReady)
+        {
+            PlayAssembleReadyAnimation();
+        }
+        else if (!isAssembleReady && _wasAssembleReady)
+        {
+            HideAssembleReadyPanel();
+        }
+
+        _wasAssembleReady = isAssembleReady;
+        _assembleButton.gameObject.SetActive(isAssembleReady);
+        _assembleButton.interactable =
+            isAssembleReady &&
             !_viewModel.IsPaused &&
+            _assembleReadySequence == null;
+    }
+
+    private bool IsAssembleReady()
+    {
+        return
+            _viewModel != null &&
+            !_viewModel.IsAssembled &&
             !_viewModel.IsStageCleared &&
             !_viewModel.IsStageFailed &&
             _viewModel.CanAssemble;
+    }
 
-        _assembleButton.gameObject.SetActive(canAssemble);
-        _assembleButton.interactable = canAssemble;
+    private void PlayAssembleReadyAnimation()
+    {
+        KillAssembleReadyTweens();
+        _assembleReadyPanel.SetActive(true);
+        _assembleReadyCanvasGroup.alpha = 0f;
+        _assembleReadyBackground.localScale = new Vector3(0f, 1f, 1f);
+        _assembleButton.transform.localScale = Vector3.one * 0.8f;
+        _assembleButton.gameObject.SetActive(true);
+        _assembleButton.interactable = false;
+
+        Sequence readySequence = DOTween.Sequence();
+        _assembleReadySequence = readySequence;
+        readySequence.Append(
+            _assembleReadyBackground.DOScaleX(1f, 0.3f)
+                .SetEase(Ease.OutQuad));
+        readySequence.Join(
+            _assembleReadyCanvasGroup.DOFade(1f, 0.3f)
+                .SetEase(Ease.OutQuad));
+        readySequence.Append(
+            _assembleButton.transform.DOScale(1.08f, 0.18f)
+                .SetEase(Ease.OutBack));
+        readySequence.Append(
+            _assembleButton.transform.DOScale(1f, 0.12f)
+                .SetEase(Ease.OutQuad));
+        readySequence.OnComplete(() =>
+        {
+            if (_assembleReadySequence != readySequence)
+            {
+                return;
+            }
+
+            _assembleReadySequence = null;
+            OnAssembleReadyAnimationCompleted();
+        });
+        readySequence.OnKill(() =>
+        {
+            if (_assembleReadySequence == readySequence)
+            {
+                _assembleReadySequence = null;
+            }
+        });
+    }
+
+    private void OnAssembleReadyAnimationCompleted()
+    {
+        if (!IsAssembleReady())
+        {
+            ResetAssembleReadyState();
+            return;
+        }
+
+        _assembleButton.interactable = !_viewModel.IsPaused;
+        StartAssembleButtonLoopAnimation();
+    }
+
+    private void StartAssembleButtonLoopAnimation()
+    {
+        _assembleButtonLoopTween?.Kill();
+        Tween buttonLoopTween = _assembleButton.transform
+            .DOScale(1.04f, 0.6f)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
+        _assembleButtonLoopTween = buttonLoopTween;
+        buttonLoopTween.OnKill(() =>
+        {
+            if (_assembleButtonLoopTween == buttonLoopTween)
+            {
+                _assembleButtonLoopTween = null;
+            }
+        });
+    }
+
+    private void HideAssembleReadyPanel()
+    {
+        KillAssembleReadyTweens();
+
+        if (_assembleReadyPanel != null)
+        {
+            _assembleReadyPanel.SetActive(false);
+        }
+
+        if (_assembleReadyBackground != null)
+        {
+            _assembleReadyBackground.localScale = Vector3.one;
+        }
+
+        if (_assembleReadyCanvasGroup != null)
+        {
+            _assembleReadyCanvasGroup.alpha = 1f;
+        }
+
+        if (_assembleButton != null)
+        {
+            _assembleButton.transform.localScale = Vector3.one;
+            _assembleButton.interactable = false;
+            _assembleButton.gameObject.SetActive(false);
+        }
+    }
+
+    private void ResetAssembleReadyState()
+    {
+        _wasAssembleReady = false;
+        HideAssembleReadyPanel();
+    }
+
+    private void KillAssembleReadyTweens()
+    {
+        Sequence readySequence = _assembleReadySequence;
+        _assembleReadySequence = null;
+        readySequence?.Kill();
+
+        Tween buttonLoopTween = _assembleButtonLoopTween;
+        _assembleButtonLoopTween = null;
+        buttonLoopTween?.Kill();
     }
 
     private void UpdateSupportCooldown(float remainingCooldown, float cooldown)
@@ -508,6 +660,22 @@ public class BABattleHudView : MonoBehaviour
             !_viewModel.IsStageCleared &&
             !_viewModel.IsStageFailed &&
             _viewModel.CanUseSupport;
+    }
+
+    private void OnEnable()
+    {
+        if (_viewModel == null)
+        {
+            return;
+        }
+
+        ResetAssembleReadyState();
+        UpdateAssembleButtonState();
+    }
+
+    private void OnDisable()
+    {
+        ResetAssembleReadyState();
     }
 
     private void OnDestroy()
