@@ -35,6 +35,7 @@ public class BABattleHudView : MonoBehaviour
     [SerializeField] private Button _assembleButton;
     [SerializeField] private TMP_Text _assembleNameText;
     [SerializeField] private TMP_Text _assembleDurationText;
+    [SerializeField] private BAAssembleSequenceUIView _assembleSequenceView;
     [SerializeField] private Button _supportButton;
     [SerializeField] private TMP_Text _supportNameText;
     [SerializeField] private TMP_Text _supportCooldownText;
@@ -43,6 +44,8 @@ public class BABattleHudView : MonoBehaviour
     private Sequence _assembleReadySequence;
     private Tween _assembleButtonLoopTween;
     private bool _wasAssembleReady;
+    private bool _isAssembleSequencePlaying;
+    private bool _isAssembleApplied;
 
     public bool Bind(BABattleHudViewModel viewModel)
     {
@@ -81,6 +84,7 @@ public class BABattleHudView : MonoBehaviour
             _assembleButton == null ||
             _assembleNameText == null ||
             _assembleDurationText == null ||
+            _assembleSequenceView == null ||
             _supportButton == null ||
             _supportNameText == null ||
             _supportCooldownText == null)
@@ -104,6 +108,8 @@ public class BABattleHudView : MonoBehaviour
         _viewModel.AssembleStateChanged += OnAssembleStateChanged;
         _viewModel.SupportCooldownChanged += OnSupportCooldownChanged;
         _viewModel.SupportActiveStateChanged += OnSupportActiveStateChanged;
+        _assembleSequenceView.ApplyAssembleRequested += OnApplyAssembleRequested;
+        _assembleSequenceView.SequenceCompleted += OnAssembleSequenceCompleted;
 
         _stageClearRestartButton.onClick.AddListener(OnRestartButtonClicked);
         _stageClearMainButton.onClick.AddListener(OnMainButtonClicked);
@@ -158,6 +164,7 @@ public class BABattleHudView : MonoBehaviour
 
     public void Unbind()
     {
+        ResetAssembleSequenceState();
         ResetAssembleReadyState();
 
         if (_stageClearRestartButton != null)
@@ -245,6 +252,12 @@ public class BABattleHudView : MonoBehaviour
             _viewModel.SupportActiveStateChanged -= OnSupportActiveStateChanged;
         }
 
+        if (_assembleSequenceView != null)
+        {
+            _assembleSequenceView.ApplyAssembleRequested -= OnApplyAssembleRequested;
+            _assembleSequenceView.SequenceCompleted -= OnAssembleSequenceCompleted;
+        }
+
         _viewModel = null;
     }
 
@@ -280,9 +293,27 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnAssembleButtonClicked()
     {
+        if (!IsAssembleReady() ||
+            _isAssembleSequencePlaying ||
+            _assembleSequenceView == null ||
+            _assembleSequenceView.IsPlaying)
+        {
+            return;
+        }
+
         KillAssembleReadyTweens();
         _assembleButton.interactable = false;
-        _viewModel?.RequestAssemble();
+
+        if (!_assembleSequenceView.Play())
+        {
+            ResetAssembleReadyState();
+            UpdateAssembleButtonState();
+            return;
+        }
+
+        _isAssembleSequencePlaying = true;
+        _isAssembleApplied = false;
+        _viewModel.RequestPause();
     }
 
     private void OnSupportButtonClicked()
@@ -302,6 +333,8 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnStageCleared()
     {
+        ResetAssembleSequenceState();
+
         if (_viewModel != null)
         {
             SetStageClearResult(
@@ -320,6 +353,8 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnStageFailed()
     {
+        ResetAssembleSequenceState();
+
         if (_viewModel != null)
         {
             SetGameOverResult(
@@ -360,6 +395,11 @@ public class BABattleHudView : MonoBehaviour
     {
         if (isAssembled)
         {
+            if (_isAssembleSequencePlaying)
+            {
+                _isAssembleApplied = true;
+            }
+
             ResetAssembleReadyState();
             UpdateAssembleDuration(
                 _viewModel.AssembleRemainingDuration,
@@ -385,6 +425,53 @@ public class BABattleHudView : MonoBehaviour
     private void OnSupportActiveStateChanged(bool isSupportActive)
     {
         UpdateSupportButtonState();
+    }
+
+    private void OnApplyAssembleRequested()
+    {
+        if (!_isAssembleSequencePlaying ||
+            _isAssembleApplied ||
+            _viewModel == null)
+        {
+            return;
+        }
+
+        _viewModel.RequestAssemble();
+        _isAssembleApplied = _viewModel.IsAssembled;
+
+        if (_isAssembleApplied)
+        {
+            return;
+        }
+
+        ResetAssembleSequenceState();
+
+        if (!_viewModel.IsStageCleared && !_viewModel.IsStageFailed)
+        {
+            _viewModel.RequestResume();
+        }
+
+        ResetAssembleReadyState();
+        UpdateAssembleButtonState();
+    }
+
+    private void OnAssembleSequenceCompleted()
+    {
+        if (!_isAssembleSequencePlaying)
+        {
+            return;
+        }
+
+        bool isAssembleApplied = _isAssembleApplied;
+        ResetAssembleSequenceState();
+
+        if (isAssembleApplied &&
+            _viewModel != null &&
+            !_viewModel.IsStageCleared &&
+            !_viewModel.IsStageFailed)
+        {
+            _viewModel.RequestResume();
+        }
     }
 
     private void UpdateHeroHealth(float currentHealth, float maxHealth)
@@ -488,6 +575,12 @@ public class BABattleHudView : MonoBehaviour
 
     private void UpdateAssembleButtonState()
     {
+        if (_isAssembleSequencePlaying)
+        {
+            _assembleButton.interactable = false;
+            return;
+        }
+
         bool isAssembleReady = IsAssembleReady();
 
         if (isAssembleReady && !_wasAssembleReady)
@@ -633,6 +726,17 @@ public class BABattleHudView : MonoBehaviour
         buttonLoopTween?.Kill();
     }
 
+    private void ResetAssembleSequenceState()
+    {
+        if (_assembleSequenceView != null)
+        {
+            _assembleSequenceView.Cancel();
+        }
+
+        _isAssembleSequencePlaying = false;
+        _isAssembleApplied = false;
+    }
+
     private void UpdateSupportCooldown(float remainingCooldown, float cooldown)
     {
         float clampedRemainingCooldown = Mathf.Clamp(
@@ -675,6 +779,7 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnDisable()
     {
+        ResetAssembleSequenceState();
         ResetAssembleReadyState();
     }
 

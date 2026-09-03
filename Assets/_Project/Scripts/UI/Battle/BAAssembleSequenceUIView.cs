@@ -4,6 +4,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BAAssembleSequenceUIView : MonoBehaviour
 {
+    private static readonly int _sequenceStateHash = Animator.StringToHash("BAAssembleSequence");
+
     [SerializeField] private Animator _animator;
     [SerializeField] private CanvasGroup _canvasGroup;
 
@@ -29,7 +31,15 @@ public class BAAssembleSequenceUIView : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = true;
         _animator.enabled = true;
+
+        if (!IsAnimatorActive())
+        {
+            gameObject.SetActive(false);
+            return false;
+        }
+
         _animator.Rebind();
+        _animator.Play(_sequenceStateHash, 0, 0f);
         _animator.Update(0f);
         _isPlaying = true;
         return true;
@@ -60,8 +70,15 @@ public class BAAssembleSequenceUIView : MonoBehaviour
 
     public void Cancel()
     {
+        if (gameObject.activeInHierarchy && IsAnimatorActive())
+        {
+            _animator.Rebind();
+            _animator.Play(_sequenceStateHash, 0, 0f);
+            _animator.Update(0f);
+        }
+
         ResetExecutionState();
-        ResetAnimator();
+        ResetCanvasGroup();
 
         if (gameObject.activeSelf)
         {
@@ -72,7 +89,6 @@ public class BAAssembleSequenceUIView : MonoBehaviour
     private void OnDisable()
     {
         ResetExecutionState();
-        ResetAnimator();
     }
 
     private void OnDestroy()
@@ -88,14 +104,23 @@ public class BAAssembleSequenceUIView : MonoBehaviour
         _isCompleteEventInvoked = false;
     }
 
-    private void ResetAnimator()
+    private void ResetCanvasGroup()
     {
-        if (_animator == null)
+        if (_canvasGroup == null)
         {
             return;
         }
 
-        _animator.Rebind();
-        _animator.Update(0f);
+        _canvasGroup.alpha = 1f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = true;
+    }
+
+    private bool IsAnimatorActive()
+    {
+        return
+            _animator != null &&
+            _animator.isActiveAndEnabled &&
+            _animator.gameObject.activeInHierarchy;
     }
 }
