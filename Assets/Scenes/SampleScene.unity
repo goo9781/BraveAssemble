@@ -2170,7 +2170,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BALoadingUIView
   _backgroundImage: {fileID: 2100000003}
-  _loadingSprites: []
+  _loadingSprites:
+  - {fileID: 21300000, guid: deee677af87219842ab5bf7b7ecb7b92, type: 3}
 --- !u!1 &2100000006
 GameObject:
   m_ObjectHideFlags: 0
