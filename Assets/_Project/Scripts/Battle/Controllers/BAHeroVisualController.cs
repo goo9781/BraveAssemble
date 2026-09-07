@@ -8,9 +8,12 @@ public class BAHeroVisualController : MonoBehaviour
     private static readonly int _isMovingParameterHash = Animator.StringToHash("IsMoving");
     private static readonly int _attackParameterHash = Animator.StringToHash("Attack");
     private static readonly int _skillParameterHash = Animator.StringToHash("Skill");
-    private static readonly int _skillStateHash = Animator.StringToHash("BraveRobot_Skill");
-    private static readonly int _skillStateFullPathHash = Animator.StringToHash("Base Layer.BraveRobot_Skill");
-    private static readonly int _idleStateHash = Animator.StringToHash("BraveRobot_Idle");
+    private static readonly int _normalSkillStateHash = Animator.StringToHash("BraveRobot_Skill");
+    private static readonly int _normalSkillStateFullPathHash = Animator.StringToHash("Base Layer.BraveRobot_Skill");
+    private static readonly int _assembledSkillStateHash = Animator.StringToHash("BraveRobot_Assembled_001_Skill");
+    private static readonly int _assembledSkillStateFullPathHash = Animator.StringToHash("Base Layer.BraveRobot_Assembled_001_Skill");
+    private static readonly int _normalIdleStateHash = Animator.StringToHash("BraveRobot_Idle");
+    private static readonly int _assembledIdleStateHash = Animator.StringToHash("BraveRobot_Assembled_001_Idle");
 
     [SerializeField] private GameObject _normalVisual;
     [SerializeField] private GameObject _assembledVisual;
@@ -257,10 +260,14 @@ public class BAHeroVisualController : MonoBehaviour
         }
 
         AnimatorStateInfo currentState = activeAnimator.GetCurrentAnimatorStateInfo(0);
+        int idleStateHash =
+            activeAnimator == _assembledAnimator ?
+            _assembledIdleStateHash :
+            _normalIdleStateHash;
 
         if (!_hasEnteredSkillState ||
             activeAnimator.IsInTransition(0) ||
-            currentState.shortNameHash != _idleStateHash)
+            currentState.shortNameHash != idleStateHash)
         {
             return;
         }
@@ -290,16 +297,20 @@ public class BAHeroVisualController : MonoBehaviour
             return false;
         }
 
+        int skillStateHash =
+            animator == _assembledAnimator ?
+            _assembledSkillStateHash :
+            _normalSkillStateHash;
         AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
 
-        if (currentState.shortNameHash == _skillStateHash)
+        if (currentState.shortNameHash == skillStateHash)
         {
             return true;
         }
 
         return
             animator.IsInTransition(0) &&
-            animator.GetNextAnimatorStateInfo(0).shortNameHash == _skillStateHash;
+            animator.GetNextAnimatorStateInfo(0).shortNameHash == skillStateHash;
     }
 
     private void ResetSkillAnimationState()
@@ -334,9 +345,14 @@ public class BAHeroVisualController : MonoBehaviour
 
     private bool HasSkillAnimation(Animator animator)
     {
+        int skillStateFullPathHash =
+            animator == _assembledAnimator ?
+            _assembledSkillStateFullPathHash :
+            _normalSkillStateFullPathHash;
+
         return
             HasSkillTrigger(animator) &&
-            animator.HasState(0, _skillStateFullPathHash);
+            animator.HasState(0, skillStateFullPathHash);
     }
 
     private void OnDisable()
