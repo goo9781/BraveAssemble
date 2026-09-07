@@ -49,11 +49,13 @@ public class BAMainUIView : MonoBehaviour
 
     private void OnStartButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         StartRequested?.Invoke();
     }
 
     private void OnQuitButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         QuitRequested?.Invoke();
     }
 

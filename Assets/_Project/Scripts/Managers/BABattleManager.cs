@@ -291,6 +291,7 @@ public class BABattleManager : MonoBehaviour
         for (int index = 0; index < targetCount; index++)
         {
             targets[index].TakeDamage(damage);
+            BAAudioManager.Instance?.PlayHit();
             hitCount++;
         }
 

@@ -89,11 +89,13 @@ public class BAStageBriefingUIView : MonoBehaviour
 
     private void OnStartBattleButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         StartBattleRequested?.Invoke();
     }
 
     private void OnBackButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         BackRequested?.Invoke();
     }
 

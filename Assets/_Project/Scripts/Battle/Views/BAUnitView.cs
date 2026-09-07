@@ -158,6 +158,8 @@ public class BAUnitView : MonoBehaviour
                 Quaternion.identity);
         }
 
+        BAAudioManager.Instance?.PlayDeath();
+
         Died?.Invoke();
         gameObject.SetActive(false);
     }

@@ -471,6 +471,8 @@ public class BAUIManager : MonoBehaviour
         {
             _startupLoadingUI.SetActive(false);
         }
+
+        BAAudioManager.Instance?.PlayMainBgm();
     }
 
     public void ShowStageBriefing()
@@ -551,6 +553,7 @@ public class BAUIManager : MonoBehaviour
 
         _mainUIInstance.SetActive(false);
         _battleHudInstance.SetActive(true);
+        BAAudioManager.Instance?.PlayBattleBgm();
 
         if (_loadingUI != null)
         {

@@ -263,16 +263,19 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnRestartButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         _viewModel?.RequestRestart();
     }
 
     private void OnQuitButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         _viewModel?.RequestQuit();
     }
 
     private void OnMainButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         _viewModel?.RequestMain();
     }
 
@@ -283,11 +286,13 @@ public class BABattleHudView : MonoBehaviour
 
     private void OnPauseButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         _viewModel?.RequestPause();
     }
 
     private void OnResumeButtonClicked()
     {
+        BAAudioManager.Instance?.PlayButton();
         _viewModel?.RequestResume();
     }
 
