@@ -18,6 +18,7 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     private BAUnitView _target;
     private BAUnitView _pendingAttackTarget;
     private bool _isInitialized;
+    private bool _isMovementPaused;
     private float _nextTargetSearchTime;
     private float _nextAttackTime;
 
@@ -115,6 +116,12 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
 
         if (offset.sqrMagnitude > attackRangeSquared)
         {
+            if (_isMovementPaused)
+            {
+                StopHorizontalMovement();
+                return;
+            }
+
             Vector2 velocity = _rigidbody.linearVelocity;
             velocity.x = Mathf.Sign(offset.x) * _unitView.MoveSpeed;
             _rigidbody.linearVelocity = velocity;
@@ -151,6 +158,16 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
 
         _nextAttackTime = Time.time + Mathf.Max(0f, _unitView.AttackInterval);
         AttackPerformed?.Invoke();
+    }
+
+    public void SetMovementPaused(bool isPaused)
+    {
+        _isMovementPaused = isPaused;
+
+        if (_isMovementPaused)
+        {
+            StopHorizontalMovement();
+        }
     }
 
     public void ApplyPendingAttackDamage()
@@ -215,6 +232,7 @@ public class BAUnitCombatController : MonoBehaviour, IBAPoolable
     {
         _target = null;
         _pendingAttackTarget = null;
+        _isMovementPaused = false;
         _nextTargetSearchTime = 0f;
         _nextAttackTime = 0f;
 

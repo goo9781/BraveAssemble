@@ -7,6 +7,10 @@ public class BAHeroVisualController : MonoBehaviour
 {
     private static readonly int _isMovingParameterHash = Animator.StringToHash("IsMoving");
     private static readonly int _attackParameterHash = Animator.StringToHash("Attack");
+    private static readonly int _skillParameterHash = Animator.StringToHash("Skill");
+    private static readonly int _skillStateHash = Animator.StringToHash("BraveRobot_Skill");
+    private static readonly int _skillStateFullPathHash = Animator.StringToHash("Base Layer.BraveRobot_Skill");
+    private static readonly int _idleStateHash = Animator.StringToHash("BraveRobot_Idle");
 
     [SerializeField] private GameObject _normalVisual;
     [SerializeField] private GameObject _assembledVisual;
@@ -14,6 +18,7 @@ public class BAHeroVisualController : MonoBehaviour
     [SerializeField] private float _movementStopDelay = 0.08f;
 
     private BAUnitCombatController _combatController;
+    private BASkillManager _skillManager;
     private Animator _normalAnimator;
     private Animator _assembledAnimator;
     private Vector3 _previousPosition;
@@ -21,6 +26,9 @@ public class BAHeroVisualController : MonoBehaviour
     private bool _isInitialized;
     private bool _isAssembled;
     private bool _isMoving;
+    private bool _isSkillAnimationActive;
+    private bool _hasEnteredSkillState;
+    private bool _hasPendingAttackAnimation;
 
     public bool IsInitialized => _isInitialized;
     public bool IsAssembled => _isAssembled;
@@ -66,12 +74,24 @@ public class BAHeroVisualController : MonoBehaviour
         TrySetAssembled(false);
     }
 
+    private void Start()
+    {
+        _skillManager = BASkillManager.Instance;
+
+        if (_skillManager != null)
+        {
+            _skillManager.SkillUsed += OnSkillUsed;
+        }
+    }
+
     private void LateUpdate()
     {
         if (!_isInitialized)
         {
             return;
         }
+
+        UpdateSkillAnimationState();
 
         Vector3 currentPosition = transform.position;
         float movementThreshold = Mathf.Max(0f, _movementThreshold);
@@ -106,12 +126,22 @@ public class BAHeroVisualController : MonoBehaviour
         bool hasAssembleStateChanged = previousIsAssembled != isAssembled;
         Animator inactiveAnimator = previousIsAssembled ? _assembledAnimator : _normalAnimator;
 
+        if (hasAssembleStateChanged && _isSkillAnimationActive)
+        {
+            ResetSkillAnimationState();
+        }
+
         if (hasAssembleStateChanged &&
             inactiveAnimator.gameObject.activeInHierarchy &&
             inactiveAnimator.isActiveAndEnabled &&
             inactiveAnimator.runtimeAnimatorController != null)
         {
             inactiveAnimator.ResetTrigger(_attackParameterHash);
+
+            if (HasSkillTrigger(inactiveAnimator))
+            {
+                inactiveAnimator.ResetTrigger(_skillParameterHash);
+            }
         }
 
         _normalVisual.SetActive(!isAssembled);
@@ -137,9 +167,16 @@ public class BAHeroVisualController : MonoBehaviour
 
     private void OnDestroy()
     {
+        ResetSkillAnimationState();
+
         if (_combatController != null)
         {
             _combatController.AttackPerformed -= OnAttackPerformed;
+        }
+
+        if (_skillManager != null)
+        {
+            _skillManager.SkillUsed -= OnSkillUsed;
         }
     }
 
@@ -152,6 +189,12 @@ public class BAHeroVisualController : MonoBehaviour
 
         Animator activeAnimator = _isAssembled ? _assembledAnimator : _normalAnimator;
 
+        if (_isSkillAnimationActive || IsSkillState(activeAnimator))
+        {
+            _hasPendingAttackAnimation = true;
+            return;
+        }
+
         if (!activeAnimator.gameObject.activeInHierarchy ||
             !activeAnimator.isActiveAndEnabled ||
             activeAnimator.runtimeAnimatorController == null)
@@ -160,6 +203,145 @@ public class BAHeroVisualController : MonoBehaviour
         }
 
         activeAnimator.SetTrigger(_attackParameterHash);
+    }
+
+    private void OnSkillUsed(int hitCount)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        Animator activeAnimator = _isAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (!activeAnimator.gameObject.activeInHierarchy ||
+            !activeAnimator.isActiveAndEnabled ||
+            activeAnimator.runtimeAnimatorController == null ||
+            !HasSkillAnimation(activeAnimator))
+        {
+            return;
+        }
+
+        _hasPendingAttackAnimation =
+            _hasPendingAttackAnimation ||
+            _combatController.HasPendingAttack;
+        activeAnimator.ResetTrigger(_attackParameterHash);
+        _isSkillAnimationActive = true;
+        _hasEnteredSkillState = false;
+        _combatController.SetMovementPaused(true);
+        SetMoving(false);
+        activeAnimator.SetTrigger(_skillParameterHash);
+    }
+
+    private void UpdateSkillAnimationState()
+    {
+        if (!_isSkillAnimationActive)
+        {
+            return;
+        }
+
+        Animator activeAnimator = _isAssembled ? _assembledAnimator : _normalAnimator;
+
+        if (!activeAnimator.gameObject.activeInHierarchy ||
+            !activeAnimator.isActiveAndEnabled ||
+            activeAnimator.runtimeAnimatorController == null)
+        {
+            ResetSkillAnimationState();
+            return;
+        }
+
+        if (IsSkillState(activeAnimator))
+        {
+            _hasEnteredSkillState = true;
+            return;
+        }
+
+        AnimatorStateInfo currentState = activeAnimator.GetCurrentAnimatorStateInfo(0);
+
+        if (!_hasEnteredSkillState ||
+            activeAnimator.IsInTransition(0) ||
+            currentState.shortNameHash != _idleStateHash)
+        {
+            return;
+        }
+
+        bool shouldPlayPendingAttack = _hasPendingAttackAnimation;
+        _isSkillAnimationActive = false;
+        _hasEnteredSkillState = false;
+        _hasPendingAttackAnimation = false;
+        _combatController.SetMovementPaused(false);
+        _previousPosition = transform.position;
+        _lastMovementTime = Time.time;
+
+        if (shouldPlayPendingAttack)
+        {
+            activeAnimator.ResetTrigger(_attackParameterHash);
+            activeAnimator.SetTrigger(_attackParameterHash);
+        }
+    }
+
+    private bool IsSkillState(Animator animator)
+    {
+        if (animator == null ||
+            !animator.gameObject.activeInHierarchy ||
+            !animator.isActiveAndEnabled ||
+            animator.runtimeAnimatorController == null)
+        {
+            return false;
+        }
+
+        AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+
+        if (currentState.shortNameHash == _skillStateHash)
+        {
+            return true;
+        }
+
+        return
+            animator.IsInTransition(0) &&
+            animator.GetNextAnimatorStateInfo(0).shortNameHash == _skillStateHash;
+    }
+
+    private void ResetSkillAnimationState()
+    {
+        _isSkillAnimationActive = false;
+        _hasEnteredSkillState = false;
+        _hasPendingAttackAnimation = false;
+
+        if (_combatController != null)
+        {
+            _combatController.SetMovementPaused(false);
+        }
+    }
+
+    private bool HasSkillTrigger(Animator animator)
+    {
+        AnimatorControllerParameter[] parameters = animator.parameters;
+
+        for (int index = 0; index < parameters.Length; index++)
+        {
+            AnimatorControllerParameter parameter = parameters[index];
+
+            if (parameter.nameHash == _skillParameterHash &&
+                parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasSkillAnimation(Animator animator)
+    {
+        return
+            HasSkillTrigger(animator) &&
+            animator.HasState(0, _skillStateFullPathHash);
+    }
+
+    private void OnDisable()
+    {
+        ResetSkillAnimationState();
     }
 
     private void SetMoving(bool isMoving)
