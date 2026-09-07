@@ -55,6 +55,7 @@ public class BASupportManager : MonoBehaviour
 
     public event Action<float, float> CooldownChanged;
     public event Action<bool> SupportActiveStateChanged;
+    public event Action AssembledSupportUsed;
 
     private void Awake()
     {
@@ -335,6 +336,7 @@ public class BASupportManager : MonoBehaviour
             _supportModel.AssembledMaxTargetCount,
             damage,
             out _);
+        AssembledSupportUsed?.Invoke();
 
         return true;
     }

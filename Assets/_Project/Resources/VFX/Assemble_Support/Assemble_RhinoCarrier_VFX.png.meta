@@ -1,0 +1,495 @@
+fileFormatVersion: 2
+guid: 9169816de1b9186409011f57a3b67e16
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1703794539734246233
+    second: RhinoCarrier_EnergyRush_FX_2x3_0
+  - first:
+      213: 6541709724659638346
+    second: RhinoCarrier_EnergyRush_FX_2x3_1
+  - first:
+      213: 2344670795928862489
+    second: RhinoCarrier_EnergyRush_FX_2x3_2
+  - first:
+      213: -7283401748200934142
+    second: RhinoCarrier_EnergyRush_FX_2x3_3
+  - first:
+      213: 2839628062597647920
+    second: RhinoCarrier_EnergyRush_FX_2x3_4
+  - first:
+      213: 3968409420852174295
+    second: RhinoCarrier_EnergyRush_FX_2x3_5
+  - first:
+      213: 9175497300691948089
+    second: RhinoCarrier_EnergyRush_FX_2x3_6
+  - first:
+      213: -8890304338403215367
+    second: RhinoCarrier_EnergyRush_FX_2x3_7
+  - first:
+      213: -4927017872532118572
+    second: RhinoCarrier_EnergyRush_FX_2x3_8
+  - first:
+      213: 513578304211803066
+    second: RhinoCarrier_EnergyRush_FX_2x3_9
+  - first:
+      213: -8959270014481194793
+    second: RhinoCarrier_EnergyRush_FX_2x3_10
+  - first:
+      213: -4585123364699181226
+    second: RhinoCarrier_EnergyRush_FX_2x3_11
+  - first:
+      213: -757446347571951704
+    second: RhinoCarrier_EnergyRush_FX_2x3_12
+  - first:
+      213: -7966896614135925231
+    second: RhinoCarrier_EnergyRush_FX_2x3_13
+  - first:
+      213: -4169523523083674188
+    second: RhinoCarrier_EnergyRush_FX_2x3_14
+  - first:
+      213: -6970235596299887507
+    second: RhinoCarrier_EnergyRush_FX_2x3_15
+  - first:
+      213: 6447744697145614199
+    second: RhinoCarrier_EnergyRush_FX_2x3_16
+  - first:
+      213: 1436365593832880593
+    second: RhinoCarrier_EnergyRush_FX_2x3_17
+  - first:
+      213: 3730419962590387277
+    second: RhinoCarrier_EnergyRush_FX_2x3_18
+  - first:
+      213: -8650814996482214564
+    second: RhinoCarrier_EnergyRush_FX_2x3_19
+  - first:
+      213: -8724400183570327999
+    second: RhinoCarrier_EnergyRush_FX_2x3_20
+  - first:
+      213: 1393160857102740699
+    second: RhinoCarrier_EnergyRush_FX_2x3_21
+  - first:
+      213: 88282079059149365
+    second: RhinoCarrier_EnergyRush_FX_2x3_22
+  - first:
+      213: -5392737680634313298
+    second: RhinoCarrier_EnergyRush_FX_2x3_23
+  - first:
+      213: -2411792392796714782
+    second: RhinoCarrier_EnergyRush_FX_2x3_24
+  - first:
+      213: -8912346622222757922
+    second: RhinoCarrier_EnergyRush_FX_2x3_25
+  - first:
+      213: 4796953776373110566
+    second: RhinoCarrier_EnergyRush_FX_2x3_26
+  - first:
+      213: -3765687827129658633
+    second: RhinoCarrier_EnergyRush_FX_2x3_27
+  - first:
+      213: -6717967661960559216
+    second: RhinoCarrier_EnergyRush_FX_2x3_28
+  - first:
+      213: 7224129236867433577
+    second: RhinoCarrier_EnergyRush_FX_2x3_29
+  - first:
+      213: -5945428515772722476
+    second: RhinoCarrier_EnergyRush_FX_2x3_30
+  - first:
+      213: 1638108996425159684
+    second: RhinoCarrier_EnergyRush_FX_2x3_31
+  - first:
+      213: -8870289736234091345
+    second: RhinoCarrier_EnergyRush_FX_2x3_32
+  - first:
+      213: -6369746406914616712
+    second: RhinoCarrier_EnergyRush_FX_2x3_33
+  - first:
+      213: 3228347569240356862
+    second: RhinoCarrier_EnergyRush_FX_2x3_34
+  - first:
+      213: -2948198639367572444
+    second: RhinoCarrier_EnergyRush_FX_2x3_35
+  - first:
+      213: -9025716525965751212
+    second: RhinoCarrier_EnergyRush_FX_2x3_36
+  - first:
+      213: -1225959069700815899
+    second: RhinoCarrier_EnergyRush_FX_2x3_37
+  - first:
+      213: -448309675152574930
+    second: RhinoCarrier_EnergyRush_FX_2x3_38
+  - first:
+      213: 5200345032050163352
+    second: RhinoCarrier_EnergyRush_FX_2x3_39
+  - first:
+      213: 7154718522157347456
+    second: RhinoCarrier_EnergyRush_FX_2x3_40
+  - first:
+      213: 3170100264881828244
+    second: RhinoCarrier_EnergyRush_FX_2x3_41
+  - first:
+      213: -6220453720472581866
+    second: RhinoCarrier_EnergyRush_FX_2x3_42
+  - first:
+      213: -3489361854456382940
+    second: RhinoCarrier_EnergyRush_FX_2x3_43
+  - first:
+      213: 3075020574509776105
+    second: RhinoCarrier_EnergyRush_FX_2x3_44
+  - first:
+      213: 5992652840600851613
+    second: RhinoCarrier_EnergyRush_FX_2x3_45
+  - first:
+      213: -2349485114074673105
+    second: RhinoCarrier_EnergyRush_FX_2x3_46
+  - first:
+      213: -3489875250239602631
+    second: RhinoCarrier_EnergyRush_FX_2x3_47
+  - first:
+      213: -83357681578054430
+    second: RhinoCarrier_EnergyRush_FX_2x3_48
+  - first:
+      213: -426421444235936565
+    second: RhinoCarrier_EnergyRush_FX_2x3_49
+  - first:
+      213: 7663005959226560776
+    second: RhinoCarrier_EnergyRush_FX_2x3_50
+  - first:
+      213: 5159706451854482279
+    second: RhinoCarrier_EnergyRush_FX_2x3_51
+  - first:
+      213: 799046166834358379
+    second: RhinoCarrier_EnergyRush_FX_2x3_52
+  - first:
+      213: -4442210996939226526
+    second: RhinoCarrier_EnergyRush_FX_2x3_53
+  - first:
+      213: 4220797474649332300
+    second: RhinoCarrier_EnergyRush_FX_2x3_54
+  - first:
+      213: -6960571782317359565
+    second: RhinoCarrier_EnergyRush_FX_2x3_55
+  - first:
+      213: -1983382238543291738
+    second: RhinoCarrier_EnergyRush_FX_2x3_56
+  - first:
+      213: -562906388036847011
+    second: RhinoCarrier_EnergyRush_FX_2x3_57
+  - first:
+      213: -7657011051232721815
+    second: RhinoCarrier_EnergyRush_FX_2x3_58
+  - first:
+      213: -8360393159650791698
+    second: RhinoCarrier_EnergyRush_FX_2x3_59
+  - first:
+      213: 166781479638256140
+    second: RhinoCarrier_EnergyRush_FX_2x3_60
+  - first:
+      213: -7392436038949754779
+    second: RhinoCarrier_EnergyRush_FX_2x3_61
+  - first:
+      213: 1547353343732733627
+    second: RhinoCarrier_EnergyRush_FX_2x3_62
+  - first:
+      213: -7762811742572316381
+    second: RhinoCarrier_EnergyRush_FX_2x3_63
+  - first:
+      213: -3137447993927132521
+    second: RhinoCarrier_EnergyRush_FX_2x3_64
+  - first:
+      213: -453466971068069645
+    second: RhinoCarrier_EnergyRush_FX_2x3_65
+  - first:
+      213: 3195531800942530842
+    second: RhinoCarrier_EnergyRush_FX_2x3_66
+  - first:
+      213: 5694950057353155131
+    second: RhinoCarrier_EnergyRush_FX_2x3_67
+  - first:
+      213: -8878900125569129473
+    second: RhinoCarrier_EnergyRush_FX_2x3_68
+  - first:
+      213: -3386837474541460729
+    second: RhinoCarrier_EnergyRush_FX_2x3_69
+  - first:
+      213: -5727150055930530987
+    second: RhinoCarrier_EnergyRush_FX_2x3_70
+  - first:
+      213: 4042287957465170999
+    second: RhinoCarrier_EnergyRush_FX_2x3_71
+  - first:
+      213: 8402322939871394768
+    second: RhinoCarrier_EnergyRush_FX_2x3_72
+  - first:
+      213: -6678869947050522508
+    second: RhinoCarrier_EnergyRush_FX_2x3_73
+  - first:
+      213: 8025108740145499338
+    second: RhinoCarrier_EnergyRush_FX_2x3_74
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0deac3b7e6c622e49a4adbd1f52add1b
+      internalID: -1662087716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_1
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e048d6862c5ede24ab265262ee8f1feb
+      internalID: 1068614184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_2
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad3ef99aa110c854f909bdc6dcfe5602
+      internalID: -977638202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6236911f76a8e30408b33a7ba36d9920
+      internalID: 1094542795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc4639281b0c18a47852b458a1cb3536
+      internalID: -1531480215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assemble_RhinoCarrier_VFX_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fff6b30dfbfe6a6458f5e26eaf666398
+      internalID: -98383745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 37fc8c96073533c44af746abc15ad71b
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Assemble_RhinoCarrier_VFX_0: -1662087716
+      Assemble_RhinoCarrier_VFX_1: 1068614184
+      Assemble_RhinoCarrier_VFX_2: -977638202
+      Assemble_RhinoCarrier_VFX_3: 1094542795
+      Assemble_RhinoCarrier_VFX_4: -1531480215
+      Assemble_RhinoCarrier_VFX_5: -98383745
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

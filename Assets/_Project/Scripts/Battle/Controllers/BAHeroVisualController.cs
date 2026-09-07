@@ -8,6 +8,7 @@ public class BAHeroVisualController : MonoBehaviour
     private static readonly int _isMovingParameterHash = Animator.StringToHash("IsMoving");
     private static readonly int _attackParameterHash = Animator.StringToHash("Attack");
     private static readonly int _skillParameterHash = Animator.StringToHash("Skill");
+    private static readonly int _playParameterHash = Animator.StringToHash("Play");
     private static readonly int _normalSkillStateHash = Animator.StringToHash("BraveRobot_Skill");
     private static readonly int _normalSkillStateFullPathHash = Animator.StringToHash("Base Layer.BraveRobot_Skill");
     private static readonly int _assembledSkillStateHash = Animator.StringToHash("BraveRobot_Assembled_001_Skill");
@@ -17,11 +18,15 @@ public class BAHeroVisualController : MonoBehaviour
 
     [SerializeField] private GameObject _normalVisual;
     [SerializeField] private GameObject _assembledVisual;
+    [SerializeField] private Animator _normalSkillEffectAnimator;
+    [SerializeField] private Animator _assembledSkillEffectAnimator;
+    [SerializeField] private Animator _assembledSupportEffectAnimator;
     [SerializeField] private float _movementThreshold = 0.001f;
     [SerializeField] private float _movementStopDelay = 0.08f;
 
     private BAUnitCombatController _combatController;
     private BASkillManager _skillManager;
+    private BASupportManager _supportManager;
     private Animator _normalAnimator;
     private Animator _assembledAnimator;
     private Vector3 _previousPosition;
@@ -85,6 +90,13 @@ public class BAHeroVisualController : MonoBehaviour
         {
             _skillManager.SkillUsed += OnSkillUsed;
         }
+
+        _supportManager = BASupportManager.Instance;
+
+        if (_supportManager != null)
+        {
+            _supportManager.AssembledSupportUsed += OnAssembledSupportUsed;
+        }
     }
 
     private void LateUpdate()
@@ -134,6 +146,12 @@ public class BAHeroVisualController : MonoBehaviour
             ResetSkillAnimationState();
         }
 
+        if (hasAssembleStateChanged)
+        {
+            ResetSkillEffectTriggers();
+            ResetAssembledSupportEffectTrigger();
+        }
+
         if (hasAssembleStateChanged &&
             inactiveAnimator.gameObject.activeInHierarchy &&
             inactiveAnimator.isActiveAndEnabled &&
@@ -170,6 +188,8 @@ public class BAHeroVisualController : MonoBehaviour
 
     private void OnDestroy()
     {
+        ResetAssembledSupportEffectTrigger();
+        ResetSkillEffectTriggers();
         ResetSkillAnimationState();
 
         if (_combatController != null)
@@ -180,6 +200,11 @@ public class BAHeroVisualController : MonoBehaviour
         if (_skillManager != null)
         {
             _skillManager.SkillUsed -= OnSkillUsed;
+        }
+
+        if (_supportManager != null)
+        {
+            _supportManager.AssembledSupportUsed -= OnAssembledSupportUsed;
         }
     }
 
@@ -234,6 +259,21 @@ public class BAHeroVisualController : MonoBehaviour
         _combatController.SetMovementPaused(true);
         SetMoving(false);
         activeAnimator.SetTrigger(_skillParameterHash);
+        Animator skillEffectAnimator =
+            _isAssembled ?
+            _assembledSkillEffectAnimator :
+            _normalSkillEffectAnimator;
+        PlaySkillEffect(skillEffectAnimator);
+    }
+
+    private void OnAssembledSupportUsed()
+    {
+        if (!_isInitialized || !_isAssembled)
+        {
+            return;
+        }
+
+        PlaySkillEffect(_assembledSupportEffectAnimator);
     }
 
     private void UpdateSkillAnimationState()
@@ -355,8 +395,77 @@ public class BAHeroVisualController : MonoBehaviour
             animator.HasState(0, skillStateFullPathHash);
     }
 
+    private void PlaySkillEffect(Animator animator)
+    {
+        if (!CanUseSkillEffectAnimator(animator))
+        {
+            return;
+        }
+
+        animator.ResetTrigger(_playParameterHash);
+        animator.SetTrigger(_playParameterHash);
+    }
+
+    private void ResetSkillEffectTriggers()
+    {
+        ResetSkillEffectTrigger(_normalSkillEffectAnimator);
+        ResetSkillEffectTrigger(_assembledSkillEffectAnimator);
+    }
+
+    private void ResetAssembledSupportEffectTrigger()
+    {
+        ResetSkillEffectTrigger(_assembledSupportEffectAnimator);
+    }
+
+    private void ResetSkillEffectTrigger(Animator animator)
+    {
+        if (animator == null ||
+            !animator.gameObject.activeInHierarchy ||
+            !animator.isActiveAndEnabled ||
+            animator.runtimeAnimatorController == null ||
+            !HasSkillEffectTrigger(animator))
+        {
+            return;
+        }
+
+        animator.ResetTrigger(_playParameterHash);
+    }
+
+    private bool CanUseSkillEffectAnimator(Animator animator)
+    {
+        if (animator == null ||
+            !animator.gameObject.activeInHierarchy ||
+            !animator.isActiveAndEnabled ||
+            animator.runtimeAnimatorController == null)
+        {
+            return false;
+        }
+
+        return HasSkillEffectTrigger(animator);
+    }
+
+    private bool HasSkillEffectTrigger(Animator animator)
+    {
+        AnimatorControllerParameter[] parameters = animator.parameters;
+
+        for (int index = 0; index < parameters.Length; index++)
+        {
+            AnimatorControllerParameter parameter = parameters[index];
+
+            if (parameter.nameHash == _playParameterHash &&
+                parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void OnDisable()
     {
+        ResetAssembledSupportEffectTrigger();
+        ResetSkillEffectTriggers();
         ResetSkillAnimationState();
     }
 

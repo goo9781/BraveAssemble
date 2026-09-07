@@ -1,0 +1,381 @@
+fileFormatVersion: 2
+guid: 9c2b81471bfc00247b8680d4438570d5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -899025600095013247
+    second: Hero_LaserFX_Transparent_3x2_0
+  - first:
+      213: 1116192979647531198
+    second: Hero_LaserFX_Transparent_3x2_1
+  - first:
+      213: 3874281736028927643
+    second: Hero_LaserFX_Transparent_3x2_2
+  - first:
+      213: -8486662473633157480
+    second: Hero_LaserFX_Transparent_3x2_3
+  - first:
+      213: -7426361044569643376
+    second: Hero_LaserFX_Transparent_3x2_4
+  - first:
+      213: -8168001669177110573
+    second: Hero_LaserFX_Transparent_3x2_5
+  - first:
+      213: 7978570708662942271
+    second: Hero_LaserFX_Transparent_3x2_6
+  - first:
+      213: -5031844641165486615
+    second: Hero_LaserFX_Transparent_3x2_7
+  - first:
+      213: -4478601723440950630
+    second: Hero_LaserFX_Transparent_3x2_8
+  - first:
+      213: -3187901713663307386
+    second: Hero_LaserFX_Transparent_3x2_9
+  - first:
+      213: -6337994273672363668
+    second: Hero_LaserFX_Transparent_3x2_10
+  - first:
+      213: 8261597214967954096
+    second: Hero_LaserFX_Transparent_3x2_11
+  - first:
+      213: -5747126380810038345
+    second: Hero_LaserFX_Transparent_3x2_12
+  - first:
+      213: 7144041374546964670
+    second: Hero_LaserFX_Transparent_3x2_13
+  - first:
+      213: 253949186893045489
+    second: Hero_LaserFX_Transparent_3x2_14
+  - first:
+      213: -5420338160970787527
+    second: Hero_LaserFX_Transparent_3x2_15
+  - first:
+      213: -1903568320944091154
+    second: Hero_LaserFX_Transparent_3x2_16
+  - first:
+      213: -1524399666116162363
+    second: Hero_LaserFX_Transparent_3x2_17
+  - first:
+      213: -675141862968506541
+    second: Hero_LaserFX_Transparent_3x2_18
+  - first:
+      213: -4453968143688638938
+    second: Hero_LaserFX_Transparent_3x2_19
+  - first:
+      213: 6727221594617954206
+    second: Hero_LaserFX_Transparent_3x2_20
+  - first:
+      213: -2654327897314153539
+    second: Hero_LaserFX_Transparent_3x2_21
+  - first:
+      213: -9090881430773103312
+    second: Hero_LaserFX_Transparent_3x2_22
+  - first:
+      213: -7821095846564346739
+    second: Hero_LaserFX_Transparent_3x2_23
+  - first:
+      213: -2778665265321805809
+    second: Hero_LaserFX_Transparent_3x2_24
+  - first:
+      213: -7579055645264712851
+    second: Hero_LaserFX_Transparent_3x2_25
+  - first:
+      213: -1852718663870492865
+    second: Hero_LaserFX_Transparent_3x2_26
+  - first:
+      213: 8197511798916810824
+    second: Hero_LaserFX_Transparent_3x2_27
+  - first:
+      213: 540545670765070274
+    second: Hero_LaserFX_Transparent_3x2_28
+  - first:
+      213: -799171174436779095
+    second: Hero_LaserFX_Transparent_3x2_29
+  - first:
+      213: -7836059347341183048
+    second: Hero_LaserFX_Transparent_3x2_30
+  - first:
+      213: 9062941812249667128
+    second: Hero_LaserFX_Transparent_3x2_31
+  - first:
+      213: -1971906552140424264
+    second: Hero_LaserFX_Transparent_3x2_32
+  - first:
+      213: 6878312029749168305
+    second: Hero_LaserFX_Transparent_3x2_33
+  - first:
+      213: 8923318090493113333
+    second: Hero_LaserFX_Transparent_3x2_34
+  - first:
+      213: -5597876940682883985
+    second: Hero_LaserFX_Transparent_3x2_35
+  - first:
+      213: 6832431887463958464
+    second: Hero_LaserFX_Transparent_3x2_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.26, y: 0.49}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: deda7b8c53c91644f8f28a99ab2df0c5
+      internalID: -1141887459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_1
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 512
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.29, y: 0.49}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 141ef607e74c3cb4aa7da5925c6752f0
+      internalID: 1151495516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_2
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 512
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.29, y: 0.49}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21d8935de4dbdb946a88fbd9ca0baa09
+      internalID: -718039322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.26, y: 0.56}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd835d7bade48124d8c0fbf5c72e45d4
+      internalID: -190160130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.19, y: 0.56}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfa585ee628927140971ddaa0c3107bf
+      internalID: 1596579143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BraveRobot_SkillEffect_BraveBust_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 512
+        height: 512
+      alignment: 9
+      pivot: {x: 0.25, y: 0.56}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8e1ee535c25654c4088e1609192c573a
+      internalID: -1681088619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 7506250b80d9ee04f938d90f37169e77
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      BraveRobot_SkillEffect_BraveBust_0: -1141887459
+      BraveRobot_SkillEffect_BraveBust_1: 1151495516
+      BraveRobot_SkillEffect_BraveBust_2: -718039322
+      BraveRobot_SkillEffect_BraveBust_3: -190160130
+      BraveRobot_SkillEffect_BraveBust_4: 1596579143
+      BraveRobot_SkillEffect_BraveBust_5: -1681088619
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
